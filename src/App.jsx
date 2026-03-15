@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
-import AnalysisPage from './pages/AnalysisPage';
+import AdmissionUpload from './pages/AdmissionUpload';
 import './App.css'; 
 
 function App() {
@@ -9,7 +9,7 @@ function App() {
     <Router>
       <MainLayout>
         <Routes>
-          <Route path="/" element={<AnalysisPage />} />
+          <Route path="/" element={<AdmissionUpload />} />
         </Routes>
       </MainLayout>
     </Router>

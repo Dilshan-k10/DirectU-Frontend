@@ -3,20 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { FiSearch, FiUploadCloud, FiX, FiArrowRight } from 'react-icons/fi';
 import { BsStars } from 'react-icons/bs';
 
-const AnalysisPage = () => {
-  const navigate = useNavigate(); // Page eka maru karanna
-  const fileInputRef = useRef(null); // Hidden file input eka trigger karanna
+const AdmissionUpload = () => {
+  const navigate = useNavigate(); // Hook for programmatic navigation
+  const fileInputRef = useRef(null); // Ref to trigger the hidden file input
   
   // State variables
-  const [programmes, setProgrammes] = useState([]); // DB eken ena data
+  const [programmes, setProgrammes] = useState([]); // Stores the list of programmes fetched from the database
   const [selectedDegree, setSelectedDegree] = useState("");
-  const [file, setFile] = useState(null); // Upload karana file eka
-  const [isDragging, setIsDragging] = useState(false); // Drag karanawada kiyala balanna
+  const [file, setFile] = useState(null); // Stores the uploaded file object
+  const [isDragging, setIsDragging] = useState(false); // Tracks whether a file is being dragged over the drop zone
 
-  // 1. Database eken data gannawa wage simulate karamu (useEffect run wenne component eka load weddi)
+  // 1. Fetch programme data on component mount
   useEffect(() => {
-    // Aththtama API ekak call karaddi methana axios.get() use karanna puluwan
     const fetchProgrammes = async () => {
+      // Simulating a database fetch. Replace this with an actual API call (e.g., axios.get) in production.
       const dbData = [
         { id: "cs", name: "BSc (Hons) Computer Science" },
         { id: "se", name: "BEng (Hons) Software Engineering" },
@@ -28,7 +28,7 @@ const AnalysisPage = () => {
     fetchProgrammes();
   }, []);
 
-  // 2. Drag & Drop Functions
+  // 2. Drag and Drop Handlers
   const handleDragOver = (e) => {
     e.preventDefault();
     setIsDragging(true);
@@ -46,21 +46,23 @@ const AnalysisPage = () => {
     }
   };
 
-  // 3. Click karala Upload karana Function eka
+  // 3. File Selection Handler (via click)
   const handleFileSelect = (e) => {
     if (e.target.files && e.target.files.length > 0) {
       setFile(e.target.files[0]);
     }
   };
 
-  // 4. File eka remove karana eka
+  // 4. Remove the currently selected file
   const removeFile = () => {
     setFile(null);
+    // Reset the input value to allow uploading the same file again if needed
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  // 5. Submit kalama wena de
+  // 5. Handle form submission
   const handleSubmit = () => {
+    // Basic validation before submission
     if (!selectedDegree) {
       alert("Please select a target programme first!");
       return;
@@ -70,15 +72,14 @@ const AnalysisPage = () => {
       return;
     }
     
-    // File ekai degree ekai thiyenawanm ilaga page ekata yanawa
-    // (Passe api me data tika backend ekata methanadi yawamu)
+    // Navigate to the processing/analyzing page upon successful validation
     navigate('/analyzing'); 
   };
 
   return (
     <div className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)] bg-gradient-to-br from-[#020520] to-[#0A1157]">
       
-      {/* Left Section - Text */}
+      {/* Left Section - Hero Text */}
       <div className="w-full lg:w-1/2 p-10 lg:p-24 flex flex-col justify-center text-white">
         <h1 className="text-5xl lg:text-7xl font-bold mb-10 leading-tight">
           Ready to <br /> Analyze Your <br /> Admission?
@@ -111,9 +112,9 @@ const AnalysisPage = () => {
             Select your target degree and upload your transcripts to receive instant AI-powered admission insights.
           </p>
 
-          {/* Dynamic Dropdown */}
+          {/* Dynamic Dropdown for Programme Selection */}
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Select Target Programme</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Select The Course</label>
             <div className="relative">
               <FiSearch className="absolute left-4 top-3.5 text-gray-400 text-lg" />
               <select 
@@ -121,8 +122,8 @@ const AnalysisPage = () => {
                 onChange={(e) => setSelectedDegree(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 rounded-xl border-none appearance-none text-gray-700 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 outline-none"
               >
-                <option value="">Search for a degree...</option>
-                {/* Database eken ena data meken map wela option widiyata pennanawa */}
+                <option value="">Select option</option>
+                {/* Dynamically populate options based on fetched database records */}
                 {programmes.map((prog) => (
                   <option key={prog.id} value={prog.id}>{prog.name}</option>
                 ))}
@@ -130,11 +131,11 @@ const AnalysisPage = () => {
             </div>
           </div>
 
-          {/* Upload Area */}
+          {/* File Upload Area */}
           <div className="mb-6">
             <label className="block text-sm font-semibold text-gray-700 mb-2">Upload Transcripts</label>
             
-            {/* Hidden File Input */}
+            {/* Hidden file input element */}
             <input 
               type="file" 
               ref={fileInputRef} 
@@ -143,6 +144,7 @@ const AnalysisPage = () => {
               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
             />
 
+            {/* Interactive Drop Zone */}
             <div 
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -161,13 +163,14 @@ const AnalysisPage = () => {
             </div>
           </div>
 
-          {/* Uploaded File Item (File ekak thiyenawanam WITHARAK pennanawa) */}
+          {/* Conditional rendering: Display the uploaded file details if a file exists */}
           {file && (
             <div className="flex items-center justify-between bg-white p-3 rounded-xl mb-8 shadow-sm border border-gray-100">
               <div className="flex items-center space-x-3">
                 <div className="bg-red-50 p-2 rounded-lg">
                   <span className="text-red-500 font-bold text-xs">
-                    {file.name.split('.').pop().toUpperCase()} {/* File extension eka gannawa (e.g. PDF) */}
+                    {/* Extract and display the file extension */}
+                    {file.name.split('.').pop().toUpperCase()} 
                   </span>
                 </div>
                 <div>
@@ -181,7 +184,7 @@ const AnalysisPage = () => {
             </div>
           )}
 
-          {/* Submit Button */}
+          {/* Form Submit Button */}
           <button 
             onClick={handleSubmit}
             className="w-full mt-2 bg-gradient-to-r from-[#3146A2] to-[#8C52FF] hover:opacity-90 transition text-white font-semibold py-4 rounded-xl flex justify-center items-center space-x-2"
@@ -196,4 +199,4 @@ const AnalysisPage = () => {
   );
 };
 
-export default AnalysisPage;
+export default AdmissionUpload;
