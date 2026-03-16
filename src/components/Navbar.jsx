@@ -23,19 +23,19 @@ const Navbar = () => {
         <div className="hidden md:flex items-center space-x-4 font-semibold text-blue-950">
           <Link 
             to="/" 
-            className="px-5 py-2 rounded-full transition-all duration-300 hover:bg-[#2A528A] hover:text-white"
+            className="px-5 py-2 rounded-full transition-all duration-300 hover:bg-primary hover:text-white"
           >
             Home
           </Link>
           <Link 
             to="/about" 
-            className="px-5 py-2 rounded-full transition-all duration-300 hover:bg-[#2A528A] hover:text-white"
+            className="px-5 py-2 rounded-full transition-all duration-300 hover:bg-primary hover:text-white"
           >
             About Us
           </Link>
           <Link 
             to="/contact" 
-            className="px-5 py-2 rounded-full transition-all duration-300 hover:bg-[#2A528A] hover:text-white"
+            className="px-5 py-2 rounded-full transition-all duration-300 hover:bg-primary hover:text-white"
           >
             Contact Us
           </Link>
@@ -45,7 +45,7 @@ const Navbar = () => {
 
       {/* Right Section: Call to Action Button */}
       <div className="hidden md:block">
-        <button className="bg-[#2A528A] text-white px-6 py-2 rounded-full hover:bg-blue-800 transition shadow-sm">
+        <button className="bg-primary text-white px-6 py-2 rounded-full hover:bg-primary-hover transition shadow-sm">
           Learn More
         </button>
       </div>
