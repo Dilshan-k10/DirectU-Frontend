@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiSearch, FiUploadCloud, FiX, FiArrowRight } from 'react-icons/fi';
+import { FiSearch, FiUploadCloud, FiX, FiArrowRight, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 import { BsStars } from 'react-icons/bs';
 
 import AOS from 'aos';
@@ -15,6 +15,8 @@ const AdmissionUpload = () => {
   const [selectedDegree, setSelectedDegree] = useState("");
   const [file, setFile] = useState(null); // Stores the uploaded file object
   const [isDragging, setIsDragging] = useState(false); // Tracks whether a file is being dragged over the drop zone
+  const [errorMsg, setErrorMsg] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
 
   // Fetch programme data on component mount
   useEffect(() => {
@@ -54,19 +56,27 @@ const AdmissionUpload = () => {
     setIsDragging(false);
   };
 
+  const validateAndSetFile = (selected) => {
+    if (selected.type !== "application/pdf") {
+      setFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      setErrorMsg("Only PDF files are accepted. Please upload a valid PDF.");
+      return;
+    }
+    setFile(selected);
+    setErrorMsg("");
+  };
+
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      setFile(e.dataTransfer.files[0]);
-    }
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0)
+      validateAndSetFile(e.dataTransfer.files[0]);
   };
 
-  //File Selection Handler (via click)
   const handleFileSelect = (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0]);
-    }
+    if (e.target.files && e.target.files.length > 0)
+      validateAndSetFile(e.target.files[0]);
   };
 
   // Remove the currently selected file
@@ -78,27 +88,55 @@ const AdmissionUpload = () => {
 
   // Handle form submission
   const handleSubmit = () => {
-    // Basic validation before submission
     if (!selectedDegree) {
-      alert("Please select a target programme first!");
+      setErrorMsg("Please select a target programme first!");
       return;
     }
     if (!file) {
-      alert("Please upload your transcript!");
+      setErrorMsg("Please upload your transcript before submitting!");
       return;
     }
-    
-    // Navigate to the processing/analyzing page upon successful validation
-    navigate('/analyzing'); 
+    setErrorMsg("");
+    setShowSuccess(true);
   };
 
   return (
     <div className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)] bg-gradient-to-br from-brand-dark to-brand-card">
-      
+
+      {/* Animation keyframes */}
+      <style>{`
+        @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.85) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes checkBounce { 0%,100% { transform: scale(1); } 30% { transform: scale(1.3); } 60% { transform: scale(0.9); } }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-6px); } 40%,80% { transform: translateX(6px); } }
+        .animate-backdrop { animation: backdropIn 0.25s ease forwards; }
+        .animate-modal { animation: modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+        .animate-check { animation: checkBounce 0.6s ease 0.2s both; }
+        .animate-shake { animation: shake 0.4s ease; }
+      `}</style>
+
+      {/* Success Modal */}
+      {showSuccess && (
+        <div className="animate-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="animate-modal bg-[#0A1035] border border-[#1A2255] rounded-3xl p-10 flex flex-col items-center text-center shadow-2xl w-80">
+            <div className="bg-green-500/10 rounded-full p-4 mb-5">
+              <FiCheckCircle className="animate-check text-green-400 text-5xl" />
+            </div>
+            <h2 className="text-white text-xl font-bold mb-2">Application Uploaded Successfully!</h2>
+            <p className="text-gray-400 text-sm mb-8">Your documents have been submitted for AI analysis.</p>
+            <button
+              onClick={() => { setShowSuccess(false); navigate('/analyzing'); }}
+              className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition text-white font-semibold py-3 rounded-xl"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      )}
+      <div className="flex flex-col lg:flex-row w-full max-w-screen-xl mx-auto flex-1 lg:gap-12">
+
       {/* Left Section - Hero Text */}
-      {/* <div className="w-full lg:w-1/2 p-10 lg:p-24 flex flex-col justify-center text-white">
-        <h1 className="text-5xl lg:text-7xl font-bold mb-10 leading-tight"> */}
-      <div data-aos="fade-right" className="w-full lg:w-1/2 p-10 lg:p-24 flex flex-col justify-center text-white">
+      <div data-aos="fade-right" className="w-full lg:w-1/2 p-10 lg:pl-16 lg:pr-8 lg:py-24 flex flex-col justify-center text-white">
         <h1 className="text-5xl lg:text-7xl font-bold mb-10 leading-tight">  
           Ready to <br /> Analyze Your <br /> Admission?
         </h1>
@@ -114,11 +152,7 @@ const AdmissionUpload = () => {
       </div>
 
       {/* Right Section - Form Card */}
-      {/* <div className="w-full lg:w-1/2 p-6 lg:p-12 flex items-center justify-center">
-        <div className="bg-[#EAEAEA] rounded-[2.5rem] p-8 lg:p-10 w-full max-w-lg shadow-2xl"> */}
-      {/* Right Section - Form Card */}
       <div className="w-full lg:w-1/2 p-6 lg:p-12 flex items-center justify-center">
-        {/* ---> Add data-aos="fade-left" and data-aos-delay="200" to this div <--- */}
         <div data-aos="fade-left" data-aos-delay="200" className="bg-brand-light rounded-[2.5rem] p-8 lg:p-10 w-full max-w-lg shadow-2xl">  
           
           <div className="flex justify-between items-center mb-2 text-sm font-semibold text-blue-900">
@@ -141,7 +175,7 @@ const AdmissionUpload = () => {
               <FiSearch className="absolute left-4 top-3.5 text-gray-400 text-lg" />
               <select 
                 value={selectedDegree}
-                onChange={(e) => setSelectedDegree(e.target.value)}
+                onChange={(e) => { setSelectedDegree(e.target.value); setErrorMsg(""); }}
                 className="w-full pl-12 pr-4 py-3 rounded-xl border-none appearance-none text-gray-700 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 outline-none"
               >
                 <option value="">Select option</option>
@@ -163,7 +197,7 @@ const AdmissionUpload = () => {
               ref={fileInputRef} 
               onChange={handleFileSelect} 
               className="hidden" 
-              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              accept=".pdf"
             />
 
             {/* Interactive Drop Zone */}
@@ -181,7 +215,7 @@ const AdmissionUpload = () => {
               <p className="text-sm text-gray-800 font-semibold mb-1">
                 <span className="text-blue-700">Click to upload</span> or drag and drop
               </p>
-              <p className="text-xs text-gray-500">PDF, DOCX, or JPG up to 10MB</p>
+              <p className="text-xs text-gray-500">PDF only up to 25MB</p>
             </div>
           </div>
 
@@ -206,6 +240,14 @@ const AdmissionUpload = () => {
             </div>
           )}
 
+          {/* Inline Error Alert */}
+          {errorMsg && (
+            <div key={errorMsg} className="animate-shake flex items-center space-x-2 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3 mb-4">
+              <FiAlertCircle className="flex-shrink-0 text-lg" />
+              <span>{errorMsg}</span>
+            </div>
+          )}
+
           {/* Form Submit Button */}
           <button 
             onClick={handleSubmit}
@@ -216,6 +258,8 @@ const AdmissionUpload = () => {
           </button>
 
         </div>
+      </div>
+
       </div>
     </div>
   );

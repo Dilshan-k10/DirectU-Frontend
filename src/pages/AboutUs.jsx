@@ -55,12 +55,12 @@ const AboutUs = () => {
   // Array to hold the team members' data
   const teamMembers = [
     // Change `img: null` to your imported image variable (e.g., `img: img1`) when you have the photos
-    { id: 1, name: "Member Name 01", role: "Project Lead / Developer", img: getImageUrl('Lahiru.jpg'), quote: "Driven by solving complex education hurdles with technology." },
-    { id: 2, name: "Member Name 02", role: "UI/UX Designer / Frontend Developer", img: getImageUrl('Raveesha.jpg'), quote: "Focusing on making complex systems simple and beautiful." },
-    { id: 3, name: "Member Name 03", role: "System Architect / Full Stack Developer", img: getImageUrl('Dilshan.jpg'), quote: "Building the robust backbone of DirectU admission logic." },
-    { id: 4, name: "Member Name 04", role: "Backend Developer", img: getImageUrl('Rakshitha.jpg'), quote: "Ensuring every student journey is bug-free and smooth." },
-    { id: 5, name: "Member Name 05", role: "AI Engineer", img: getImageUrl('Mathisha.jpg'), quote: "Analyzing academic trends to provide smart recommendations." },
-    { id: 6, name: "Member Name 06", role: "Quality Assurance", img: getImageUrl('Thamindu.jpg'), quote: "Crafting the visual experience that students interact with." }
+    { id: 1, name: "Sandeepa Bandara", role: "Project Lead / Developer", img: getImageUrl('Lahiru.jpg'), quote: "Driven by solving complex education hurdles with technology." },
+    { id: 2, name: "Raveesha Eranda", role: "UI/UX Designer / Frontend Developer", img: getImageUrl('Raveesha.jpg'), quote: "Focusing on making complex systems simple and beautiful." },
+    { id: 3, name: "Dilshan Kavinda", role: "System Architect / Full Stack Developer", img: getImageUrl('Dilshan.jpg'), quote: "Building the robust backbone of DirectU admission logic." },
+    { id: 4, name: "Rakshitha Wishwajith", role: "Backend Developer", img: getImageUrl('Rakshitha.jpg'), quote: "Ensuring every student journey is bug-free and smooth." },
+    { id: 5, name: "Praveen Mathisha", role: "AI Engineer", img: getImageUrl('Mathisha.jpg'), quote: "Analyzing academic trends to provide smart recommendations." },
+    { id: 6, name: "Thamindu Dinujaya", role: "Quality Assurance", img: getImageUrl('Thamindu.jpg'), quote: "Crafting the visual experience that students interact with." }
   ];
 
   // Array for Phase 1 achievements
