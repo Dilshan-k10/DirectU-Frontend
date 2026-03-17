@@ -4,7 +4,6 @@ import MainLayout from './layouts/MainLayout';
 import AdmissionUpload from './pages/AdmissionUpload';
 import AboutUs from './pages/AboutUs';
 import Register from './pages/Register';
-import Login from './pages/Login';
 import './App.css'; 
 
 

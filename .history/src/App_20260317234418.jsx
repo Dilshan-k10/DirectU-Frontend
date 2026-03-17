@@ -3,8 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import AdmissionUpload from './pages/AdmissionUpload';
 import AboutUs from './pages/AboutUs';
-import Register from './pages/Register';
-import Login from './pages/Login';
 import './App.css'; 
 
 
@@ -15,7 +13,6 @@ function App() {
         <Routes>
           <Route path="/" element={<AdmissionUpload />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
           <Route path="/about" element={<AboutUs />} />
         </Routes>
       </MainLayout>
