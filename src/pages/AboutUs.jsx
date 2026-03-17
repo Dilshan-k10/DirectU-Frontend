@@ -72,12 +72,12 @@ const AboutUs = () => {
   ];
 
   return (
-    <div className="bg-[#03061A] min-h-screen text-white py-16 px-6 md:px-12 lg:px-24 font-sans overflow-hidden">
+    <div className="bg-brand-dark min-h-screen text-white py-16 px-6 md:px-12 lg:px-24 font-sans overflow-hidden">
       
       {/* 1. Hero Section - Fades in from the top */}
       <div className="text-center max-w-4xl mx-auto mb-20" data-aos="fade-down">
         <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-wide">
-          Meet the Minds Behind <span className="text-[#8C52FF]">DirectU</span>
+          Meet the Minds Behind <span className="text-accent">DirectU</span>
         </h1>
         <p className="text-gray-400 text-sm md:text-base leading-relaxed">
           We are a team of passionate innovators dedicated to modernizing the university 
@@ -93,7 +93,7 @@ const AboutUs = () => {
             key={item.id} 
             data-aos="fade-up" 
             data-aos-delay={index * 150} // Delays each card slightly for a wave effect
-            className="bg-[#0A1035] rounded-3xl p-8 flex flex-col items-center text-center border border-[#1A2255] shadow-lg hover:-translate-y-2 transition-transform duration-300"
+            className="bg-brand-card rounded-3xl p-8 flex flex-col items-center text-center border border-brand-border shadow-lg hover:-translate-y-2 transition-transform duration-300"
           >
             {item.icon}
             <h3 className="text-xl font-bold mb-3 text-gray-100">{item.title}</h3>
@@ -112,11 +112,11 @@ const AboutUs = () => {
               key={member.id} 
               data-aos="fade-up"
               data-aos-delay={index * 100}
-              className="bg-[#0A1035] rounded-3xl p-8 flex flex-col items-center text-center border border-[#1A2255] shadow-lg"
+              className="bg-brand-card rounded-3xl p-8 flex flex-col items-center text-center border border-brand-border shadow-lg"
             >
               
               {/* Dynamic Profile Picture Section - Updated to a 3:4 portrait curved box */}
-              <div className="w-32 aspect-[3/4] rounded-2xl border-2 border-[#8C52FF] mb-5 overflow-hidden flex items-center justify-center bg-gradient-to-br from-[#4b2c91] to-[#251547] shadow-md transition-transform hover:scale-105 duration-300">
+              <div className="w-32 aspect-[3/4] rounded-2xl border-2 border-accent mb-5 overflow-hidden flex items-center justify-center bg-gradient-to-br from-[#4b2c91] to-[#251547] shadow-md transition-transform hover:scale-105 duration-300">
                 {member.img ? (
                   <img src={member.img} alt={member.name} className="w-full h-full object-cover object-top" />
                 ) : (
@@ -126,7 +126,7 @@ const AboutUs = () => {
               
               {/* Member Details */}
               <h3 className="text-xl font-bold text-gray-100 mb-1">{member.name}</h3>
-              <p className="text-[#8C52FF] text-sm font-semibold mb-4">{member.role}</p>
+              <p className="text-accent text-sm font-semibold mb-4">{member.role}</p>
               <p className="text-gray-400 text-sm italic px-4">"{member.quote}"</p>
             </div>
           ))}
@@ -141,7 +141,7 @@ const AboutUs = () => {
           <h2 className="text-3xl lg:text-4xl font-bold mb-2">
             What We Achieved in
           </h2>
-          <h2 className="text-3xl lg:text-4xl font-bold text-[#8C52FF] mb-8">
+          <h2 className="text-3xl lg:text-4xl font-bold text-accent mb-8">
             Phase 1
           </h2>
           <ul className="space-y-4">
@@ -156,7 +156,7 @@ const AboutUs = () => {
 
         {/* Right Side: Project Statistics Card - Slides in from the right */}
         <div className="w-full lg:w-1/2" data-aos="fade-left">
-          <div className="bg-[#0A1035] rounded-3xl p-8 border border-[#1A2255] shadow-2xl">
+          <div className="bg-brand-card rounded-3xl p-8 border border-brand-border shadow-2xl">
             <h3 className="text-xl font-bold text-gray-100 mb-6">Project Statistics</h3>
             
             <div className="grid grid-cols-2 gap-4">

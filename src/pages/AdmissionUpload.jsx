@@ -93,7 +93,7 @@ const AdmissionUpload = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)] bg-gradient-to-br from-[#020520] to-[#0A1157]">
+    <div className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)] bg-gradient-to-br from-brand-dark to-brand-card">
       
       {/* Left Section - Hero Text */}
       {/* <div className="w-full lg:w-1/2 p-10 lg:p-24 flex flex-col justify-center text-white">
@@ -119,14 +119,14 @@ const AdmissionUpload = () => {
       {/* Right Section - Form Card */}
       <div className="w-full lg:w-1/2 p-6 lg:p-12 flex items-center justify-center">
         {/* ---> Add data-aos="fade-left" and data-aos-delay="200" to this div <--- */}
-        <div data-aos="fade-left" data-aos-delay="200" className="bg-[#EAEAEA] rounded-[2.5rem] p-8 lg:p-10 w-full max-w-lg shadow-2xl">  
+        <div data-aos="fade-left" data-aos-delay="200" className="bg-brand-light rounded-[2.5rem] p-8 lg:p-10 w-full max-w-lg shadow-2xl">  
           
           <div className="flex justify-between items-center mb-2 text-sm font-semibold text-blue-900">
             <span>Step 1 of 3</span>
             <span className="text-gray-500">Upload Documents</span>
           </div>
           <div className="w-full bg-gray-300 rounded-full h-2 mb-8">
-            <div className="bg-[#7455F6] h-2 rounded-full w-1/3"></div>
+            <div className="bg-accent-hover h-2 rounded-full w-1/3"></div>
           </div>
 
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Start Your Application Analysis</h2>
@@ -209,7 +209,7 @@ const AdmissionUpload = () => {
           {/* Form Submit Button */}
           <button 
             onClick={handleSubmit}
-            className="w-full mt-2 bg-gradient-to-r from-[#3146A2] to-[#8C52FF] hover:opacity-90 transition text-white font-semibold py-4 rounded-xl flex justify-center items-center space-x-2"
+            className="w-full mt-2 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition text-white font-semibold py-4 rounded-xl flex justify-center items-center space-x-2"
           >
             <span>Submit for AI Analysis</span>
             <FiArrowRight className="text-lg" />
