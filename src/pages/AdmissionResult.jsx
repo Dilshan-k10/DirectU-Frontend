@@ -45,6 +45,15 @@ function getBreakdownIcon(passed) {
   );
 }
 
+function normalizePass(item) {
+  if (!item) return false;
+  if (typeof item.passed === 'boolean') return item.passed;
+  const raw = item.result ?? item.status;
+  if (!raw) return false;
+  const s = String(raw).toLowerCase();
+  return s === 'pass' || s === 'passed' || s === 'success' || s === 'ok' || s === 'true';
+}
+
 const AdmissionResult = () => {
   const navigate = useNavigate();
   const { applicationId: applicationIdParam } = useParams();
@@ -95,22 +104,25 @@ const AdmissionResult = () => {
     };
   }, [applicationId]);
 
-  const status = normalizeStatus(resultData?.status);
+  const apiData = resultData?.data || null;
+  const qualification = apiData?.qualification || null;
+  const application = apiData?.application || null;
+  const alternatives = Array.isArray(apiData?.alternatives) ? apiData.alternatives : [];
+
+  const status = normalizeStatus(qualification?.feedbackType);
   const statusUi = STATUS_UI[status] || null;
 
-  const explanation = resultData?.explanation || '';
-  const reasons = Array.isArray(resultData?.reasons)
-    ? resultData.reasons.filter(Boolean)
-    : resultData?.reasons
-      ? [String(resultData.reasons)]
-      : [];
+  const explanation = qualification?.message || '';
+  const reasons = qualification?.reasons && Array.isArray(qualification.reasons) ? qualification.reasons.filter(Boolean) : [];
 
-  const analysisBreakdown = Array.isArray(resultData?.analysis_breakdown) ? resultData.analysis_breakdown : [];
+  const analysisBreakdown = Array.isArray(qualification?.analysis_breakdown) ? qualification.analysis_breakdown : [];
 
-  const alternativeProgram = resultData?.alternative_program || null;
-  const alternativeProgramId = alternativeProgram?.id || alternativeProgram?.program_id || '';
-  const alternativeProgramName = alternativeProgram?.name || alternativeProgram?.program_name || '';
-  const alternativeProgramDescription = alternativeProgram?.description || '';
+  const primaryAlternative = alternatives[0] || null;
+  const alternativeProgram = primaryAlternative?.program || null;
+  const alternativeReason = primaryAlternative?.reason || '';
+  const alternativeProgramId = alternativeProgram?.id || primaryAlternative?.programId || '';
+  const alternativeProgramName = alternativeProgram?.name || '';
+  const alternativeProgramDescription = alternativeReason || '';
 
   const showBreakdown = status === 'not_qualified';
   const showAlternative = Boolean(alternativeProgram && (alternativeProgramName || alternativeProgramDescription));
@@ -134,6 +146,12 @@ const AdmissionResult = () => {
       setReconsidering(false);
     }
   };
+
+  useEffect(() => {
+    if (application && typeof application.reconsiderationLocked === 'boolean') {
+      setReconsiderLocked(application.reconsiderationLocked);
+    }
+  }, [application]);
 
   return (
     <div className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)] bg-gradient-to-br from-brand-dark to-brand-card">
@@ -165,17 +183,13 @@ const AdmissionResult = () => {
               <div className="mt-8 bg-brand-card/70 border border-brand-border rounded-3xl p-5 max-w-md">
                 <div className="flex items-center gap-4">
                   <img
-                    src={alternativeProgram?.image || alternativeProgram?.image_url || alternativeIllustration}
+                    src={alternativeIllustration}
                     alt="Alternative programme"
                     className="w-16 h-16 rounded-2xl bg-white/10 p-2 object-contain"
                   />
                   <div>
                     <h4 className="text-white font-semibold">{alternativeProgramName}</h4>
-                    {alternativeProgram?.subtitle ? (
-                      <p className="text-gray-300 text-xs">{alternativeProgram.subtitle}</p>
-                    ) : (
-                      <p className="text-gray-300 text-xs">{alternativeProgram?.type || ' '}</p>
-                    )}
+                    <p className="text-gray-300 text-xs">{alternativeProgram?.level ? String(alternativeProgram.level) : ' '}</p>
                   </div>
                 </div>
                 {alternativeProgramDescription ? (
@@ -226,12 +240,12 @@ const AdmissionResult = () => {
                       }`}
                     >
                       <FiAlertCircle className="text-base" />
-                      {statusUi?.badgeText || (resultData?.status ? String(resultData.status).toUpperCase() : '')}
+                      {statusUi?.badgeText || (qualification?.feedbackType ? String(qualification.feedbackType).toUpperCase() : '')}
                     </span>
                   </div>
 
                   <h2 className="text-center text-2xl font-extrabold text-gray-900 leading-snug">
-                    {statusUi?.header || resultData?.title || ' '}
+                    {statusUi?.header || qualification?.title || ' '}
                   </h2>
 
                   {reasons.length > 0 && (
@@ -257,11 +271,7 @@ const AdmissionResult = () => {
 
                       <ul className="space-y-3 text-sm">
                         {analysisBreakdown.map((item, idx) => {
-                          const passed =
-                            Boolean(item?.passed) ||
-                            item?.result === 'pass' ||
-                            item?.status === 'pass' ||
-                            item?.status === 'passed';
+                          const passed = normalizePass(item);
                           const title = item?.title || '';
                           const description = item?.description || '';
 
