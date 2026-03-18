@@ -13,7 +13,7 @@ const Login = () => {
   const handleChange = (field) => (e) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -118,11 +118,12 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-accent to-accent-hover hover:opacity-90 text-white font-bold py-4 rounded-lg shadow-lg shadow-accent/20 transition-all active:scale-[0.98] mt-2 mb-8 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full bg-gradient-to-r from-accent to-accent-hover hover:opacity-90 text-white font-bold py-4 rounded-lg shadow-lg shadow-accent/20 transition-all active:scale-[0.98] mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loading ? 'Signing in...' : 'Sign In'}
               </button>
             </form>
+
 
           </div>
 
