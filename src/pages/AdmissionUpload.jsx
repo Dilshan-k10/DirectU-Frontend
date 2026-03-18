@@ -27,12 +27,13 @@ const AdmissionUpload = () => {
   }, []);
 
   useEffect(() => {
+    // Replace with actual API call (e.g., axios.get) in production
     const fetchProgrammes = async () => {
       const dbData = [
-        { id: "cs", name: "BSc (Hons) Computer Science" },
-        { id: "se", name: "BEng (Hons) Software Engineering" },
-        { id: "is", name: "BSc (Hons) Information Systems" },
-        { id: "ds", name: "BSc (Hons) Data Science" },
+        { id: 'cs', name: 'BSc (Hons) Computer Science' },
+        { id: 'se', name: 'BEng (Hons) Software Engineering' },
+        { id: 'is', name: 'BSc (Hons) Information Systems' },
+        { id: 'ds', name: 'BSc (Hons) Data Science' },
       ];
       setProgrammes(dbData);
     };
@@ -43,15 +44,18 @@ const AdmissionUpload = () => {
   const handleDragLeave = () => setIsDragging(false);
 
   const validateAndSetFile = (selected) => {
-    if (selected.type !== "application/pdf") {
+    if (selected.type !== 'application/pdf') {
       setFile(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      setErrorMsg("Only PDF files are accepted. Please upload a valid PDF.");
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      setErrorMsg('Only PDF files are accepted. Please upload a valid PDF.');
       return;
     }
     setFile(selected);
-    setErrorMsg("");
+    setErrorMsg('');
   };
+
+  const handleDragOver = (e) => { e.preventDefault(); setIsDragging(true); };
+  const handleDragLeave = () => setIsDragging(false);
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -72,6 +76,19 @@ const AdmissionUpload = () => {
     if (!selectedDegree) { setErrorMsg("Please select a target programme first!"); return; }
     if (!file) { setErrorMsg("Please upload your transcript before submitting!"); return; }
     setErrorMsg("");
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleSubmit = () => {
+    if (!selectedDegree) {
+      setErrorMsg('Please select a target programme first!');
+      return;
+    }
+    if (!file) {
+      setErrorMsg('Please upload your transcript before submitting!');
+      return;
+    }
+    setErrorMsg('');
     setShowSuccess(true);
   };
 
@@ -123,7 +140,6 @@ const AdmissionUpload = () => {
             </p>
           </div>
         </div>
-      </div>
 
       {/* Right Section */}
       <div className="w-full lg:w-1/2 p-6 lg:p-12 flex items-center justify-center">
@@ -187,7 +203,6 @@ const AdmissionUpload = () => {
               </p>
               <p className="text-xs text-gray-500">PDF only, up to 25MB</p>
             </div>
-          </div>
 
           {/* Selected File */}
           {file && (
@@ -199,13 +214,38 @@ const AdmissionUpload = () => {
                 <div>
                   <p className="text-sm font-semibold text-gray-800 truncate w-40 sm:w-56">{file.name}</p>
                   <p className="text-xs text-gray-500">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+            {/* File Upload Area */}
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Upload Transcripts</label>
+
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                className="hidden"
+                accept=".pdf"
+              />
+
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current.click()}
+                className={`border-2 border-dashed rounded-2xl p-8 text-center transition cursor-pointer
+                  ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white hover:bg-gray-50'}`}
+              >
+                <div className="bg-blue-50 w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3">
+                  <FiUploadCloud className="text-blue-600 text-2xl" />
                 </div>
+                <p className="text-sm text-gray-800 font-semibold mb-1">
+                  <span className="text-blue-700">Click to upload</span> or drag and drop
+                </p>
+                <p className="text-xs text-gray-500">PDF only — up to 25MB</p>
               </div>
               <button onClick={removeFile} className="text-gray-400 hover:text-red-500 transition">
                 <FiX className="text-lg" />
               </button>
             </div>
-          )}
 
           {/* Error */}
           {errorMsg && (
@@ -224,8 +264,45 @@ const AdmissionUpload = () => {
             <FiArrowRight className="text-lg" />
           </button>
 
+            {/* Uploaded File Preview */}
+            {file && (
+              <div className="flex items-center justify-between bg-white p-3 rounded-xl mb-6 shadow-sm border border-gray-100">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-red-50 p-2 rounded-lg">
+                    <span className="text-red-500 font-bold text-xs">
+                      {file.name.split('.').pop().toUpperCase()}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-800 truncate w-40 sm:w-56">{file.name}</p>
+                    <p className="text-xs text-gray-500">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                  </div>
+                </div>
+                <button onClick={removeFile} className="text-gray-400 hover:text-red-500 transition">
+                  <FiX className="text-lg" />
+                </button>
+              </div>
+            )}
+
+            {/* Inline Error Alert */}
+            {errorMsg && (
+              <div key={errorMsg} className="animate-shake flex items-center space-x-2 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3 mb-4">
+                <FiAlertCircle className="flex-shrink-0 text-lg" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <button
+              onClick={handleSubmit}
+              className="w-full mt-2 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition text-white font-semibold py-4 rounded-xl flex justify-center items-center space-x-2"
+            >
+              <span>Submit for AI Analysis</span>
+              <FiArrowRight className="text-lg" />
+            </button>
+
+          </div>
         </div>
-      </div>
 
     </div>
   );
