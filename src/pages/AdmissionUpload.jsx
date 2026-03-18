@@ -2,13 +2,19 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiSearch, FiUploadCloud, FiX, FiArrowRight } from "react-icons/fi";
 import { BsStars } from "react-icons/bs";
+import { getUser } from "../api/axiosClient";
 
 import AOS from "aos";
 import "aos/dist/aos.css";
 
 const AdmissionUpload = () => {
-  const navigate = useNavigate(); // Hook for programmatic navigation
-  const fileInputRef = useRef(null); // Ref to trigger the hidden file input
+  const navigate = useNavigate();
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    const user = getUser();
+    console.log("Logged in user:", user);
+  }, []);
 
   // State variables
   const [programmes, setProgrammes] = useState([]); // Stores the list of programmes fetched from the database
