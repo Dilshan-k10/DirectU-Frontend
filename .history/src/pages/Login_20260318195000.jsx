@@ -13,9 +13,9 @@ const Login = () => {
   const handleChange = (field) => (e) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError(er);
     setLoading(true);
     try {
       await login(form.email, form.password);
