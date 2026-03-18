@@ -7,8 +7,6 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import './App.css'; 
 import AdmissionResult from './pages/AdmissionResult';
-import ContactUs from './pages/ContactUs';
-import Analyzing from './pages/Analyzing';
 
 
 function App() {
@@ -22,9 +20,8 @@ function App() {
           <Route path="/result/:applicationId" element={<AdmissionResult />} />
           <Route path="/result" element={<AdmissionResult />} />
           <Route path="/not-qualified" element={<AdmissionResult />} />
-          <Route path="/analyzing" element={<Analyzing />} />
           <Route path="/about" element={<AboutUs />} />
-          <Route path="/contact" element={<ContactUs />} />
+          
         </Routes>
       </MainLayout>
     </Router>
