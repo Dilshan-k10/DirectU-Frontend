@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import ContactUs from './pages/ContactUs';
 import './App.css'; 
+import Analyzing from './pages/Analyzing';
 
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
+          <Route path="/analyzing" element={<Analyzing />} />
         </Routes>
       </MainLayout>
     </Router>
