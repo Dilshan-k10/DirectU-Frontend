@@ -13,7 +13,7 @@ const Login = () => {
   const handleChange = (field) => (e) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -118,12 +118,34 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-accent to-accent-hover hover:opacity-90 text-white font-bold py-4 rounded-lg shadow-lg shadow-accent/20 transition-all active:scale-[0.98] mt-2 mb-8 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full bg-gradient-to-r from-accent to-accent-hover hover:opacity-90 text-white font-bold py-4 rounded-lg shadow-lg shadow-accent/20 transition-all active:scale-[0.98] mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loading ? 'Signing in...' : 'Sign In'}
               </button>
             </form>
 
+            {/* Divider */}
+            <div className="relative my-8">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-200 dark:border-brand-border" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white dark:bg-brand-card px-2 text-slate-500">Or continue with</span>
+              </div>
+            </div>
+
+            {/* SSO */}
+            <button
+              type="button"
+              className="w-full flex items-center justify-center gap-3 bg-white dark:bg-[#2e2a37] border border-slate-200 dark:border-transparent text-slate-700 dark:text-white font-semibold py-3 rounded-lg hover:bg-slate-50 dark:hover:bg-[#383345] transition-colors"
+            >
+              <img
+                src="https://www.google.com/favicon.ico"
+                alt="Google"
+                className="w-5 h-5"
+              />
+              University Single Sign-On
+            </button>
           </div>
 
           {/* Card Footer */}
