@@ -8,7 +8,7 @@ const axiosClient = axios.create({
 
 // Attach accessToken to every request
 axiosClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
+  const token = sessionStorage.getItem("accessToken");
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -27,7 +27,7 @@ axiosClient.interceptors.response.use(
   async (error) => {
     const original = error.config;
 
-    const hasToken = localStorage.getItem("accessToken");
+    const hasToken = sessionStorage.getItem("accessToken");
     if (error.response?.status === 401 && !original._retry && hasToken) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -43,12 +43,12 @@ axiosClient.interceptors.response.use(
       original._retry = true;
       isRefreshing = true;
 
-      const refreshToken = localStorage.getItem("refreshToken");
+      const refreshToken = sessionStorage.getItem("refreshToken");
 
       if (!refreshToken) {
         isRefreshing = false;
         clearTokens();
-        window.location.href = "/login";
+        window.dispatchEvent(new Event("auth:logout"));
         return Promise.reject(error);
       }
 
@@ -58,7 +58,7 @@ axiosClient.interceptors.response.use(
           { refreshToken }
         );
         const newAccessToken = data.accessToken;
-        localStorage.setItem("accessToken", newAccessToken);
+        sessionStorage.setItem("accessToken", newAccessToken);
         axiosClient.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
         processQueue(null, newAccessToken);
         original.headers.Authorization = `Bearer ${newAccessToken}`;
@@ -66,7 +66,7 @@ axiosClient.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError, null);
         clearTokens();
-        window.location.href = "/login";
+        window.dispatchEvent(new Event("auth:logout"));
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -78,20 +78,24 @@ axiosClient.interceptors.response.use(
 );
 
 export const saveTokens = (accessToken, refreshToken, user) => {
-  localStorage.setItem("accessToken", accessToken);
-  localStorage.setItem("refreshToken", refreshToken);
-  localStorage.setItem("user", JSON.stringify(user));
+  sessionStorage.setItem("accessToken", accessToken);
+  sessionStorage.setItem("refreshToken", refreshToken);
+  sessionStorage.setItem("user", JSON.stringify(user));
 };
 
 export const clearTokens = () => {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
-  localStorage.removeItem("user");
+  sessionStorage.removeItem("accessToken");
+  sessionStorage.removeItem("refreshToken");
+  sessionStorage.removeItem("user");
 };
 
 export const getUser = () => {
-  const user = localStorage.getItem("user");
-  return user ? JSON.parse(user) : null;
+  try {
+    const user = sessionStorage.getItem("user");
+    return user ? JSON.parse(user) : null;
+  } catch {
+    return null;
+  }
 };
 
 export default axiosClient;

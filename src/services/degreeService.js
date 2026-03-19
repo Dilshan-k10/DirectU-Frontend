@@ -5,7 +5,7 @@ import axiosClient from "../api/axiosClient";
 export const getDegrees = async () => {
     try {
       const response = await axiosClient.get("/uniadmin/degrees");
-      return response.data;
+      return response.data.data.degrees;
     } catch (error) {
       console.error("Error fetching degrees:", error);
       throw error;
