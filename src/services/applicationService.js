@@ -50,3 +50,20 @@ export async function reconsiderApplication(applicationId, newProgramId) {
   });
 }
 
+
+
+
+// ------------------------------------------------------------Dilshan------------------------------------------------------------
+
+import axiosClient from "../api/axiosClient";
+
+export const submitApplication = async (programId, intakeId, document) => {
+  const formData = new FormData();
+  formData.append("programId", programId);
+  formData.append("intakeId", intakeId);
+  formData.append("document", document);
+  const response = await axiosClient.post("/applications/apply", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
