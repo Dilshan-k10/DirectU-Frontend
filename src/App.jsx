@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import AdmissionUpload from './pages/AdmissionUpload';
 import AboutUs from './pages/AboutUs';
@@ -11,9 +11,20 @@ import AdmissionResult from './pages/AdmissionResult';
 import Analyzing from './pages/Analyzing';
 
 
+function AuthLogoutListener() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const handler = () => navigate("/login");
+    window.addEventListener("auth:logout", handler);
+    return () => window.removeEventListener("auth:logout", handler);
+  }, [navigate]);
+  return null;
+}
+
 function App() {
   return (
     <Router>
+      <AuthLogoutListener />
       <MainLayout>
         <Routes>
           <Route path="/" element={<AdmissionUpload />} />

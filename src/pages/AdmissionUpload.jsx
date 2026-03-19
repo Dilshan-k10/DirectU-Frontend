@@ -1,7 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiSearch, FiUploadCloud, FiX, FiArrowRight, FiCheckCircle, FiAlertCircle } from "react-icons/fi";
+import {
+  FiSearch,
+  FiUploadCloud,
+  FiX,
+  FiArrowRight,
+  FiCheckCircle,
+  FiAlertCircle,
+} from "react-icons/fi";
 import { BsStars } from "react-icons/bs";
+import { submitApplication } from "../services/applicationService";
+import { getDegrees } from "../services/degreeService";
+import { getIntakes } from "../services/intakeService";
 import { getUser } from "../api/axiosClient";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -12,34 +22,44 @@ const AdmissionUpload = () => {
 
   const [programmes, setProgrammes] = useState([]);
   const [selectedDegree, setSelectedDegree] = useState("");
+  const [intake, setIntake] = useState(null);
   const [file, setFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const user = getUser();
-    console.log("Logged in user:", user);
-  }, []);
+    if (!user?.name) navigate("/login");
+  }, [navigate]);
 
   useEffect(() => {
     AOS.init({ duration: 1000, once: true, offset: 50 });
   }, []);
 
   useEffect(() => {
-    const fetchProgrammes = async () => {
-      const dbData = [
-        { id: "cs", name: "BSc (Hons) Computer Science" },
-        { id: "se", name: "BEng (Hons) Software Engineering" },
-        { id: "is", name: "BSc (Hons) Information Systems" },
-        { id: "ds", name: "BSc (Hons) Data Science" },
-      ];
-      setProgrammes(dbData);
-    };
-    fetchProgrammes();
+    getDegrees()
+      .then((data) => {
+        console.log("Fetched degrees:", data);
+        setProgrammes(data);
+      })
+      .catch(() => setErrorMsg("Failed to load degree programmes."));
   }, []);
 
-  const handleDragOver = (e) => { e.preventDefault(); setIsDragging(true); };
+  useEffect(() => {
+    getIntakes()
+      .then((data) => {
+        console.log("Fetched intakes:", data);
+        setIntake(data);
+      })
+      .catch(() => setErrorMsg("Failed to load intakes."));
+  }, []);
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
   const handleDragLeave = () => setIsDragging(false);
 
   const validateAndSetFile = (selected) => {
@@ -56,7 +76,8 @@ const AdmissionUpload = () => {
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
-    if (e.dataTransfer.files?.length > 0) validateAndSetFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files?.length > 0)
+      validateAndSetFile(e.dataTransfer.files[0]);
   };
 
   const handleFileSelect = (e) => {
@@ -68,16 +89,29 @@ const AdmissionUpload = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleSubmit = () => {
-    if (!selectedDegree) { setErrorMsg("Please select a target programme first!"); return; }
-    if (!file) { setErrorMsg("Please upload your transcript before submitting!"); return; }
+  const handleSubmit = async () => {
+    if (!selectedDegree) {
+      setErrorMsg("Please select a target programme first!");
+      return;
+    }
+    if (!file) {
+      setErrorMsg("Please upload your transcript before submitting!");
+      return;
+    }
     setErrorMsg("");
-    setShowSuccess(true);
+    setLoading(true);
+    try {
+      await submitApplication(selectedDegree, intake?.id, file);
+      setShowSuccess(true);
+    } catch (err) {
+      setErrorMsg(err.response?.data?.error || "Failed to submit application.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)] bg-gradient-to-br from-brand-dark to-brand-card">
-
       <style>{`
         @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes modalIn { from { opacity: 0; transform: scale(0.85) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
@@ -96,8 +130,12 @@ const AdmissionUpload = () => {
             <div className="bg-green-500/10 rounded-full p-4 mb-5">
               <FiCheckCircle className="animate-check text-green-400 text-5xl" />
             </div>
-            <h2 className="text-white text-xl font-bold mb-2">Application Uploaded Successfully!</h2>
-            <p className="text-gray-400 text-sm mb-8">Your documents have been submitted for AI analysis.</p>
+            <h2 className="text-white text-xl font-bold mb-2">
+              Application Uploaded Successfully!
+            </h2>
+            <p className="text-gray-400 text-sm mb-8">
+              Your documents have been submitted for AI analysis.
+            </p>
             <button
               onClick={() => { setShowSuccess(false); navigate("/analyzing"); }}
               className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition text-white font-semibold py-3 rounded-xl"
@@ -109,7 +147,10 @@ const AdmissionUpload = () => {
       )}
 
       {/* Left Section */}
-      <div data-aos="fade-right" className="w-full lg:w-1/2 p-10 lg:pl-16 lg:pr-8 lg:py-24 flex flex-col justify-center text-white">
+      <div
+        data-aos="fade-right"
+        className="w-full lg:w-1/2 p-10 lg:pl-16 lg:pr-8 lg:py-24 flex flex-col justify-center text-white"
+      >
         <h1 className="text-5xl lg:text-7xl font-bold mb-10 leading-tight">
           Ready to <br /> Analyze Your <br /> Admission?
         </h1>
@@ -127,8 +168,11 @@ const AdmissionUpload = () => {
 
       {/* Right Section */}
       <div className="w-full lg:w-1/2 p-6 lg:p-12 flex items-center justify-center">
-        <div data-aos="fade-left" data-aos-delay="200" className="bg-brand-light rounded-[2.5rem] p-8 lg:p-10 w-full max-w-lg shadow-2xl">
-
+        <div
+          data-aos="fade-left"
+          data-aos-delay="200"
+          className="bg-brand-light rounded-[2.5rem] p-8 lg:p-10 w-full max-w-lg shadow-2xl"
+        >
           <div className="flex justify-between items-center mb-2 text-sm font-semibold text-blue-900">
             <span>Step 1 of 3</span>
             <span className="text-gray-500">Upload Documents</span>
@@ -137,24 +181,53 @@ const AdmissionUpload = () => {
             <div className="bg-accent-hover h-2 rounded-full w-1/3" />
           </div>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Start Your Application Analysis</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Start Your Application Analysis
+          </h2>
           <p className="text-gray-600 text-sm mb-8">
-            Select your target degree and upload your transcripts to receive instant AI-powered admission insights.
+            Select your target degree and upload your transcripts to receive
+            instant AI-powered admission insights.
           </p>
+
+          {/* Intake */}
+          <div className="mb-6">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Intake
+            </label>
+            <div className="relative">
+              <FiSearch className="absolute left-4 top-3.5 text-gray-400 text-lg" />
+              <input
+                type="text"
+                value={intake?.name || ""}
+                placeholder="Loading intake..."
+                readOnly
+                className="w-full pl-12 pr-4 py-3 rounded-xl border-none text-gray-700 bg-white shadow-sm outline-none cursor-default"
+              />
+            </div>
+          </div>
 
           {/* Degree Dropdown */}
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Select The Course</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Select The Course
+            </label>
             <div className="relative">
               <FiSearch className="absolute left-4 top-3.5 text-gray-400 text-lg" />
               <select
                 value={selectedDegree}
-                onChange={(e) => { setSelectedDegree(e.target.value); setErrorMsg(""); }}
+                onChange={(e) => {
+                  const selected = programmes.find((p) => p.id === e.target.value);
+                  console.log("Selected degree:", selected?.name, "| ID:", selected?.id);
+                  setSelectedDegree(e.target.value);
+                  setErrorMsg("");
+                }}
                 className="w-full pl-12 pr-4 py-3 rounded-xl border-none appearance-none text-gray-700 bg-white shadow-sm focus:ring-2 focus:ring-blue-500 outline-none"
               >
                 <option value="">Select option</option>
                 {programmes.map((prog) => (
-                  <option key={prog.id} value={prog.id}>{prog.name}</option>
+                  <option key={prog.id} value={prog.id}>
+                    {prog.name}
+                  </option>
                 ))}
               </select>
             </div>
@@ -162,7 +235,9 @@ const AdmissionUpload = () => {
 
           {/* File Upload */}
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Upload Transcripts</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Upload Transcripts
+            </label>
             <input
               type="file"
               ref={fileInputRef}
@@ -194,11 +269,17 @@ const AdmissionUpload = () => {
             <div className="flex items-center justify-between bg-white p-3 rounded-xl mb-4 shadow-sm border border-gray-100">
               <div className="flex items-center space-x-3">
                 <div className="bg-red-50 p-2 rounded-lg">
-                  <span className="text-red-500 font-bold text-xs">{file.name.split(".").pop().toUpperCase()}</span>
+                  <span className="text-red-500 font-bold text-xs">
+                    {file.name.split(".").pop().toUpperCase()}
+                  </span>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-800 truncate w-40 sm:w-56">{file.name}</p>
-                  <p className="text-xs text-gray-500">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                  <p className="text-sm font-semibold text-gray-800 truncate w-40 sm:w-56">
+                    {file.name}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {(file.size / (1024 * 1024)).toFixed(2)} MB
+                  </p>
                 </div>
               </div>
               <button onClick={removeFile} className="text-gray-400 hover:text-red-500 transition">
@@ -209,7 +290,10 @@ const AdmissionUpload = () => {
 
           {/* Error */}
           {errorMsg && (
-            <div key={errorMsg} className="animate-shake flex items-center space-x-2 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3 mb-4">
+            <div
+              key={errorMsg}
+              className="animate-shake flex items-center space-x-2 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3 mb-4"
+            >
               <FiAlertCircle className="flex-shrink-0 text-lg" />
               <span>{errorMsg}</span>
             </div>
@@ -218,15 +302,14 @@ const AdmissionUpload = () => {
           {/* Submit */}
           <button
             onClick={handleSubmit}
-            className="w-full mt-2 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition text-white font-semibold py-4 rounded-xl flex justify-center items-center space-x-2"
+            disabled={loading}
+            className="w-full mt-2 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition text-white font-semibold py-4 rounded-xl flex justify-center items-center space-x-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <span>Submit for AI Analysis</span>
-            <FiArrowRight className="text-lg" />
+            <span>{loading ? "Submitting..." : "Submit for AI Analysis"}</span>
+            {!loading && <FiArrowRight className="text-lg" />}
           </button>
-
         </div>
       </div>
-
     </div>
   );
 };
