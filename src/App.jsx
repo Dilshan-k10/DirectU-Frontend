@@ -8,7 +8,6 @@ import Login from './pages/Login';
 import ContactUs from './pages/ContactUs';
 import './App.css'; 
 import AdmissionResult from './pages/AdmissionResult';
-import ContactUs from './pages/ContactUs';
 import Analyzing from './pages/Analyzing';
 
 
