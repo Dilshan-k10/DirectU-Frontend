@@ -28,7 +28,6 @@ export async function reconsiderApplication(applicationId, newProgramId) {
 
 // ------------------------------------------------------------Dilshan------------------------------------------------------------
 
-import axiosClient from "../api/axiosClient";
 
 export const submitApplication = async (programId, intakeId, document) => {
   const formData = new FormData();
