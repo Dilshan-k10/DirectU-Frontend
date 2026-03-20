@@ -26,7 +26,7 @@ const CARDS = [
     ),
     bg: 'bg-[#1e2a6e]',
     title: 'Course Match',
-    desc: 'Suggesting suitable programs based on analysis results.',
+    desc: ',
   },
   {
     icon: (
@@ -36,7 +36,7 @@ const CARDS = [
     ),
     bg: 'bg-[#1e2a6e]',
     title: 'Predictive Score',
-    desc: 'Rank with a confidence score indicating admission chances.',
+    desc: 'Generating admission probability based on historical data.',
   },
 ];
 
