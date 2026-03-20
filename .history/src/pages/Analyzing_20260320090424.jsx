@@ -36,7 +36,7 @@ const CARDS = [
     ),
     bg: 'bg-[#1e2a6e]',
     title: 'Predictive Score',
-    desc: 'Rank with a confidence score indicating admission chances.',
+    desc: 'Rank with ',
   },
 ];
 

@@ -15,8 +15,8 @@ const CARDS = [
       </svg>
     ),
     bg: 'bg-[#1e2a6e]',
-    title: 'Qualification Analysis',
-    desc: 'Evaluating academic records against program requirements.',
+    title: 'GPA Analysis',
+    desc: 'Calculating weighted scores based on course difficulty.',
   },
   {
     icon: (
@@ -26,7 +26,7 @@ const CARDS = [
     ),
     bg: 'bg-[#1e2a6e]',
     title: 'Course Match',
-    desc: 'Suggesting suitable programs based on analysis results.',
+    desc: 'Matching completed credits against university prerequisites.',
   },
   {
     icon: (
@@ -36,7 +36,7 @@ const CARDS = [
     ),
     bg: 'bg-[#1e2a6e]',
     title: 'Predictive Score',
-    desc: 'Rank with a confidence score indicating admission chances.',
+    desc: 'Generating admission probability based on historical data.',
   },
 ];
 
@@ -68,14 +68,16 @@ const Analyzing = () => {
         .fade-step { animation: fadeStep 2s ease-in-out infinite; }
       `}</style>
 
-      <div className="px-16 py-10 bg-brand-light rounded-[2.5rem] shadow-md">
+      <div className="p-4 bg-brand-light rounded-[2.5rem] shadow-md">
         <div className="w-full max-w-2xl">
           {/* Header */}
           <div className="flex justify-between items-center mb-3">
+            <h1 className="text-xl font-bold text-gray-800">
+              Application Analysis
+            </h1>
             <span className="text-sm font-semibold text-[#3b4fd8]">
               Step 2 of 3
             </span>
-            <span className="text-gray-500">Application Analysis</span>
           </div>
 
           {/* Progress bar */}
@@ -93,7 +95,7 @@ const Analyzing = () => {
                   cy="48"
                   r="40"
                   fill="none"
-                  stroke="primary"
+                  stroke="#e5e7eb"
                   strokeWidth="8"
                 />
                 <circle
@@ -101,7 +103,7 @@ const Analyzing = () => {
                   cy="48"
                   r="40"
                   fill="none"
-                  stroke="#2A528A"
+                  stroke="#3b4fd8"
                   strokeWidth="8"
                   strokeDasharray="180 72"
                   strokeLinecap="round"
@@ -109,7 +111,7 @@ const Analyzing = () => {
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-12 h-12 bg-[#2A528A] rounded-full flex items-center justify-center">
+                <div className="w-12 h-12 bg-[#3b4fd8] rounded-full flex items-center justify-center">
                   <svg
                     viewBox="0 0 24 24"
                     className="w-6 h-6 text-white"
@@ -122,7 +124,7 @@ const Analyzing = () => {
             </div>
 
             <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              Analyzing Your Admission
+              Analyzing Your Profile
             </h2>
             <p className="text-gray-500 text-sm mb-6 max-w-sm">
               Our AI is currently reviewing your academic records and evaluating
@@ -137,6 +139,9 @@ const Analyzing = () => {
               >
                 <span className="w-2 h-2 rounded-full bg-[#3b4fd8] inline-block flex-shrink-0" />
                 {STEPS[stepIndex]}
+              </p>
+              <p className="text-xs text-[#3b4fd8] mt-1">
+                Estimated time remaining: ~15 seconds
               </p>
             </div>
           </div>
