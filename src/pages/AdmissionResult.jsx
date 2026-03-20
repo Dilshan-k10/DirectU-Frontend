@@ -80,11 +80,7 @@ const AdmissionResult = () => {
       try {
         setLoading(true);
         setError('');
-        const data = await getApplicationResult(applicationId);
-        if (!alive) return;
-        setResultData(data);
-      } catch (e) {
-        if (!alive) return;
+        const { data } = await axiosClient.get(`/evaluation/${encodeURIComponent(applicationId)}`);
         setError(e?.message || 'Failed to load application result.');
       } finally {
         if (!alive) return;
@@ -137,10 +133,10 @@ const AdmissionResult = () => {
     try {
       setReconsidering(true);
       setError('');
-      await reconsiderApplication(applicationId, alternativeProgramId);
-      setReconsiderLocked(true);
-      navigate('/exam');
-    } catch (e) {
+      await axiosClient.put(
+        `/evaluation/${encodeURIComponent(applicationId)}/selected-program`,
+        { programId: alternativeProgramId }
+      );
       setError(e?.message || 'Failed to reconsider application.');
     } finally {
       setReconsidering(false);
