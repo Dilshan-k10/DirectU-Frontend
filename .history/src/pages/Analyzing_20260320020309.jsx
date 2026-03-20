@@ -15,8 +15,8 @@ const CARDS = [
       </svg>
     ),
     bg: 'bg-[#1e2a6e]',
-    title: 'Qualification Analysis',
-    desc: 'Evaluating academic records against program requirements.',
+    title: 'GPA Analysis',
+    desc: 'Calculating weighted scores based on course difficulty.',
   },
   {
     icon: (
@@ -26,7 +26,7 @@ const CARDS = [
     ),
     bg: 'bg-[#1e2a6e]',
     title: 'Course Match',
-    desc: 'Suggesting suitable programs based on analysis results.',
+    desc: 'Matching completed credits against university prerequisites.',
   },
   {
     icon: (
@@ -36,7 +36,7 @@ const CARDS = [
     ),
     bg: 'bg-[#1e2a6e]',
     title: 'Predictive Score',
-    desc: 'Rank with a confidence score indicating admission chances.',
+    desc: 'Generating admission probability based on historical data.',
   },
 ];
 
@@ -137,6 +137,9 @@ const Analyzing = () => {
               >
                 <span className="w-2 h-2 rounded-full bg-[#3b4fd8] inline-block flex-shrink-0" />
                 {STEPS[stepIndex]}
+              </p>
+              <p className="text-xs text-[#3b4fd8] mt-1">
+                Estimated time remaining: ~15 seconds
               </p>
             </div>
           </div>

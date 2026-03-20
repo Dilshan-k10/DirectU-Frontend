@@ -37,8 +37,8 @@ const Login = () => {
     if (Object.values(fieldErrors).some(Boolean)) { setErrors(fieldErrors); return; }
     setLoading(true);
     try {
-      await login(form.email, form.password);
-      navigate('/');
+      const res = await login(form.email, form.password);
+      navigate(res.data?.role === 'ADMIN' ? '/admin' : '/');
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password");
     } finally {

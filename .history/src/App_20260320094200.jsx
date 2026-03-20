@@ -1,21 +1,18 @@
-import React, { useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useNavigate,
-} from "react-router-dom";
-import MainLayout from "./layouts/MainLayout";
-import DashboardLayout from "./layouts/DashboardLayout";
-import AdmissionUpload from "./pages/AdmissionUpload";
-import AboutUs from "./pages/AboutUs";
-import Register from "./pages/Register";
-import Login from "./pages/Login";
-import ContactUs from "./pages/ContactUs";
-import "./App.css";
-import AdmissionResult from "./pages/AdmissionResult";
-import Analyzing from "./pages/Analyzing";
-import Overview from "./pages/admin_pages/Overview";
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import MainLayout from './layouts/MainLayout';
+import DashboardLayout from './layouts/DashboardLayout';
+import AdmissionUpload from './pages/AdmissionUpload';
+import AboutUs from './pages/AboutUs';
+import Register from './pages/Register';
+import Login from './pages/Login';
+import ContactUs from './pages/ContactUs';
+import './App.css';
+import AdmissionResult from './pages/AdmissionResult';
+import Analyzing from './pages/Analyzing';
+import Dashboard from './pages/admin_pages/Overview';
+
+
 
 function AuthLogoutListener() {
   const navigate = useNavigate();
@@ -32,9 +29,10 @@ function App() {
     <Router>
       <AuthLogoutListener />
       <Routes>
+
         {/* ── Admin routes — DashboardLayout only, no Navbar/Footer ── */}
         <Route path="/admin" element={<DashboardLayout />}>
-          <Route index element={<Overview />} />
+          <Route index element={<Dashboard />} />
           {/* <Route path="applications" element={<Applications />} /> */}
           {/* <Route path="users" element={<Users />} /> */}
           {/* <Route path="degrees" element={<Degrees />} /> */}
@@ -54,6 +52,7 @@ function App() {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
         </Route>
+
       </Routes>
     </Router>
   );
