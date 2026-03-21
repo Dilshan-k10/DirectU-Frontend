@@ -278,15 +278,27 @@ const AdmissionResult = () => {
           {!loading && !error && (
             <div data-aos="fade-left" data-aos-delay="200">
               {alternatives.length > 0 ? (
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
                   <img
                     src={programImages[alternativeProgramId] || "/images/default.jpg"}
                     alt={alternativeProgramName}
-                    className="w-full h-32 object-cover rounded-2xl mb-4"
+                    className="w-full h-48 object-cover rounded-2xl mb-6"
                   />
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{alternativeProgramName}</h3>
-                  <p className="text-gray-600 text-sm mb-2">Level: {alternativeProgram?.level}</p>
-                  <p className="text-gray-700 text-sm mb-4">{alternativeReason}</p>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">{alternativeProgramName}</h3>
+                  <div className="space-y-4 mb-6">
+                    <div>
+                      <p className="text-gray-500 text-sm font-semibold mb-1">LEVEL</p>
+                      <p className="text-gray-900 text-base">{alternativeProgram?.level}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-sm font-semibold mb-1">DURATION</p>
+                      <p className="text-gray-900 text-base">{alternativeProgram?.duration || "Not specified"}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-sm font-semibold mb-1">WHY THIS PROGRAM</p>
+                      <p className="text-gray-700 text-base">{alternativeReason}</p>
+                    </div>
+                  </div>
                   <button
                     onClick={handleReconsider}
                     disabled={reconsiderLocked || reconsidering}
