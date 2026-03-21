@@ -16,6 +16,8 @@ import "./App.css";
 import AdmissionResult from "./pages/AdmissionResult";
 import Analyzing from "./pages/Analyzing";
 import Overview from "./pages/admin_pages/Overview";
+import Applications from "./pages/admin_pages/Applications";
+import ApplicationDetail from "./pages/admin_pages/ApplicationDetail";
 
 function AuthLogoutListener() {
   const navigate = useNavigate();
@@ -35,7 +37,8 @@ function App() {
         {/* ── Admin routes — DashboardLayout only, no Navbar/Footer ── */}
         <Route path="/admin" element={<DashboardLayout />}>
           <Route index element={<Overview />} />
-          {/* <Route path="applications" element={<Applications />} /> */}
+          <Route path="applications" element={<Applications />} />
+          <Route path="applications/:applicationId" element={<ApplicationDetail />} />
           {/* <Route path="users" element={<Users />} /> */}
           {/* <Route path="degrees" element={<Degrees />} /> */}
           {/* <Route path="intakes" element={<Intakes />} /> */}

@@ -108,3 +108,32 @@ export const getApplicationCountByProgram = async () => {
     throw error;
   }
 };
+
+// get number of applications for a specific intake: Fetches the count of applications for a given intake ID.
+export const getApplicationCountByIntake = async () => {
+  try {
+    const response = await axiosClient.get("/applications/all/applications");
+    const grouped = {};
+    response.data.data.forEach((app) => {
+      const name = app.intake?.name || app.intakeId;
+      grouped[name] = (grouped[name] || 0) + 1;
+    });
+    return Object.entries(grouped).map(([name, count]) => ({ name, count }));
+  } catch (error) {
+    console.error("Error fetching application count by intake:", error);
+    throw error;
+  }
+};
+
+
+// View submited Application: Fetches the details of a specific application by its ID.
+export const viewApplicationById = async (applicationId) => {
+  if (!applicationId) throw new Error('Missing applicationId');
+  try {
+    const response = await axiosClient.get(`/applications/view/${applicationId}`, { responseType: 'blob' });
+    return { data: response.data };
+  } catch (error) {
+    console.error(`Error fetching application with ID ${applicationId}:`, error);
+    throw error;
+  }
+};
