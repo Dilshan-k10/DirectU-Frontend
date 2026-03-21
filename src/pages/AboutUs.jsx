@@ -3,29 +3,20 @@ import { FiTarget, FiCheck } from 'react-icons/fi';
 import { FaLightbulb } from 'react-icons/fa';
 import { IoRocketOutline } from 'react-icons/io5';
 
-// Import AOS library and its CSS for scroll animations
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
-/* INSTRUCTIONS TO ADD TEAM PHOTOS:
-  1. Put your images in the "src/assets" folder (e.g., member1.jpg, member2.jpg).
-  2. Import them here at the top like this:
-     import img1 from '../assets/member1.jpg';
-     import img2 from '../assets/member2.jpg';
-  3. Go to the "teamMembers" array below, and change `img: null` to `img: img1`.
-*/
+
 
 const AboutUs = () => {
-  // Initialize AOS animation library when the component loads
   useEffect(() => {
     AOS.init({
-      duration: 1000, // Animation duration in milliseconds
-      once: true,     // Whether animation should happen only once while scrolling down
-      offset: 100,    // Offset (in px) from the original trigger point
+      duration: 1000, 
+      once: true,     
+      offset: 100,   
     });
   }, []);
 
-  // Array to hold the core values data for the top cards
   const coreValues = [
     {
       id: 1,
@@ -46,15 +37,13 @@ const AboutUs = () => {
       description: "Expanding DirectU to become the global standard for skill-aligned university intake."
     }
   ];
-  // Helper function to dynamically resolve image paths from the assets folder in Vite
+
   const getImageUrl = (imageName) => {
     return new URL(`../assets/${imageName}`, import.meta.url).href;
   };
 
 
-  // Array to hold the team members' data
   const teamMembers = [
-    // Change `img: null` to your imported image variable (e.g., `img: img1`) when you have the photos
     { id: 1, name: "Sandeepa Bandara", role: "Project Lead / Developer", img: getImageUrl('Lahiru.jpg'), quote: "Driven by solving complex education hurdles with technology." },
     { id: 2, name: "Raveesha Eranda", role: "UI/UX Designer / Frontend Developer", img: getImageUrl('Raveesha.jpg'), quote: "Focusing on making complex systems simple and beautiful." },
     { id: 3, name: "Dilshan Kavinda", role: "System Architect / Full Stack Developer", img: getImageUrl('Dilshan.jpg'), quote: "Building the robust backbone of DirectU admission logic." },
@@ -63,7 +52,6 @@ const AboutUs = () => {
     { id: 6, name: "Thamindu Dinujaya", role: "Quality Assurance", img: getImageUrl('Thamindu.jpg'), quote: "Crafting the visual experience that students interact with." }
   ];
 
-  // Array for Phase 1 achievements
   const achievements = [
     "Smart Admission Document Analysis",
     "Automated Entrance Exam Generation",
@@ -74,7 +62,7 @@ const AboutUs = () => {
   return (
     <div className="bg-brand-dark min-h-screen text-white py-16 px-6 md:px-12 lg:px-24 font-sans overflow-hidden">
       
-      {/* 1. Hero Section - Fades in from the top */}
+      {/* Hero Section */}
       <div className="text-center max-w-4xl mx-auto mb-20" data-aos="fade-down">
         <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-wide">
           Meet the Minds Behind <span className="text-accent">DirectU</span>
@@ -86,13 +74,12 @@ const AboutUs = () => {
         </p>
       </div>
 
-      {/* 2. Core Values Section - Staggered fade-up animation */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10 mb-28">
         {coreValues.map((item, index) => (
           <div 
             key={item.id} 
             data-aos="fade-up" 
-            data-aos-delay={index * 150} // Delays each card slightly for a wave effect
+            data-aos-delay={index * 150} 
             className="bg-brand-card rounded-3xl p-8 flex flex-col items-center text-center border border-brand-border shadow-lg hover:-translate-y-2 transition-transform duration-300"
           >
             {item.icon}
@@ -102,7 +89,7 @@ const AboutUs = () => {
         ))}
       </div>
 
-      {/* 3. Expert Team Section */}
+      {/* Expert Team Section */}
       <div className="mb-28">
         <h2 className="text-3xl font-bold text-center mb-12" data-aos="fade-up">Our Expert Team</h2>
         
@@ -115,7 +102,6 @@ const AboutUs = () => {
               className="bg-brand-card rounded-3xl p-8 flex flex-col items-center text-center border border-brand-border shadow-lg"
             >
               
-              {/* Dynamic Profile Picture Section - Updated to a 3:4 portrait curved box */}
               <div className="w-32 aspect-[3/4] rounded-2xl border-2 border-accent mb-5 overflow-hidden flex items-center justify-center bg-gradient-to-br from-[#4b2c91] to-[#251547] shadow-md transition-transform hover:scale-105 duration-300">
                 {member.img ? (
                   <img src={member.img} alt={member.name} className="w-full h-full object-cover object-top" />
@@ -124,7 +110,6 @@ const AboutUs = () => {
                 )}
               </div>
               
-              {/* Member Details */}
               <h3 className="text-xl font-bold text-gray-100 mb-1">{member.name}</h3>
               <p className="text-accent text-sm font-semibold mb-4">{member.role}</p>
               <p className="text-gray-400 text-sm italic px-4">"{member.quote}"</p>
@@ -133,10 +118,8 @@ const AboutUs = () => {
         </div>
       </div>
 
-      {/* 4. Achievements and Statistics Section */}
       <div className="flex flex-col lg:flex-row gap-16 justify-between items-center bg-[#050920] rounded-[3rem] p-10 lg:p-16 border border-[#1A2255]">
         
-        {/* Left Side: Achievements List - Slides in from the left */}
         <div className="w-full lg:w-1/2" data-aos="fade-right">
           <h2 className="text-3xl lg:text-4xl font-bold mb-2">
             What We Achieved in
@@ -154,7 +137,6 @@ const AboutUs = () => {
           </ul>
         </div>
 
-        {/* Right Side: Project Statistics Card - Slides in from the right */}
         <div className="w-full lg:w-1/2" data-aos="fade-left">
           <div className="bg-brand-card rounded-3xl p-8 border border-brand-border shadow-2xl">
             <h3 className="text-xl font-bold text-gray-100 mb-6">Project Statistics</h3>

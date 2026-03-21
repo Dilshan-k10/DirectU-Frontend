@@ -4,7 +4,6 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 
 const ContactUs = () => {
-  // --- New States for Form Handling ---
   const [formData, setFormData] = useState({
     firstName: '', lastName: '', email: '', subject: '', message: ''
   });
@@ -16,37 +15,33 @@ const ContactUs = () => {
     AOS.init({ duration: 1000, once: true, offset: 50 });
   }, []);
 
-  // --- Input Change Handler ---
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError(""); // Clear errors when user starts typing
+    setError(""); 
   };
 
-  // --- Submit & Validation Logic ---
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // 1. Check if ANY field is empty
     if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim() || !formData.subject.trim() || !formData.message.trim()) {
       setError("Please fill in all the blank fields before sending.");
       return;
     }
 
-    // 2. Start Submitting State
     setIsSubmitting(true);
 
-    // 3. Simulate Email Sending (Here you will add EmailJS or your Backend API later)
     setTimeout(() => {
       setIsSubmitting(false);
-      setShowModal(true); // Show Success Modal
+      setShowModal(true); 
       setFormData({ firstName: '', lastName: '', email: '', subject: '', message: '' }); // Clear form
-    }, 1500); // 1.5 seconds loading simulation
+    }, 1500); 
   };
   return (
-    // Main Wrapper - Takes full height minus navbar
+   
     <div className="min-h-[calc(100vh-80px)] bg-brand-dark py-12 lg:py-20 flex items-center justify-center font-sans overflow-hidden">
       
-      {/* Responsive Hero Container - Scales up on larger screens */}
+      
       <div className="w-full max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 md:px-12">
         
         {/* Header Section */}
@@ -62,7 +57,6 @@ const ContactUs = () => {
         {/* Main Grid Layout */}
         <div className="flex flex-col lg:flex-row gap-8 xl:gap-12 2xl:gap-16">
           
-          {/* ================= LEFT COLUMN ================= */}
           <div className="w-full lg:w-[45%] flex flex-col gap-8 xl:gap-10" data-aos="fade-right">
             
             {/* Contact Information Card */}
@@ -109,7 +103,7 @@ const ContactUs = () => {
               </div>
             </div>
 
-            {/* Google Maps Embed - Working link for Bambalapitiya */}
+            {/* Google Maps Embed */}
             <div className="h-64 xl:h-72 2xl:h-80 w-full bg-brand-card rounded-[2rem] border border-brand-border overflow-hidden shadow-xl">
               <iframe 
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31686.08581692257!2d79.83612805404555!3d6.885741630138382!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae25b630252b95b%3A0x868b137fc824b423!2sBambalapitiya%2C%20Colombo!5e0!3m2!1sen!2slk!4v1710660000000!5m2!1sen!2slk" 
@@ -125,7 +119,7 @@ const ContactUs = () => {
 
           </div>
 
-          {/* ================= RIGHT COLUMN (FORM) ================= */}
+
           <div className="w-full lg:w-[55%]" data-aos="fade-left" data-aos-delay="200">
             <div className="bg-brand-card rounded-[2rem] p-8 xl:p-10 2xl:p-12 border border-brand-border shadow-2xl h-full flex flex-col justify-center">
               
@@ -179,7 +173,7 @@ const ContactUs = () => {
                   ></textarea>
                 </div>
 
-                {/* Error Message Display */}
+                
                 {error && (
                   <div className="bg-red-500/10 text-red-400 border border-red-500/20 text-sm font-semibold px-4 py-3 rounded-xl mt-2 text-center animate-pulse">
                     {error}
@@ -202,7 +196,6 @@ const ContactUs = () => {
           </div>
 
         </div>
-        {/* ---------------- Success Popup Modal ---------------- */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
           <div 
@@ -230,7 +223,7 @@ const ContactUs = () => {
           </div>
         </div>
       )}
-      {/* ---------------- End of Modal ---------------- */}
+      
       </div>
     </div>
   );

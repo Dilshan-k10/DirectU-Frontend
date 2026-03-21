@@ -8,14 +8,14 @@ const Intakes = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingIntake, setEditingIntake] = useState(null);
   
-  // Mock Data
+
   const [intakes, setIntakes] = useState([
     {
       id: 1,
       name: "2026 September Intake",
       startDate: "2026-06-01",
       deadline: "2026-08-15",
-      status: "Active", // Active, Upcoming, Closed
+      status: "Active", 
       applicationCount: 342
     },
     {
@@ -57,8 +57,7 @@ const Intakes = () => {
       setIntakes([savedIntake, ...intakes]);
     }
   };
-
-  // Status එකට අනුව Badge එකේ පාට වෙනස් කරන Function එක
+  
   const getStatusBadge = (status) => {
     switch(status) {
       case 'Active':
