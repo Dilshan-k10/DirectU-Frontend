@@ -14,7 +14,7 @@ export async function reconsiderApplication(applicationId, newProgramId) {
   if (!applicationId) throw new Error('Missing applicationId');
   if (!newProgramId) throw new Error('Missing newProgramId');
   try {
-    const response = await axiosClient.put(`/evaluation/${encodeURIComponent(applicationId)}/selected-program`, {
+    const response = await axiosClient.post(`/evaluation/${encodeURIComponent(applicationId)}/select-alternative`, {
       programId: newProgramId,
     });
     return response.data;
