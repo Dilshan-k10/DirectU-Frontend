@@ -1,6 +1,8 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
+import { getUser } from '../../api/axiosClient';
+import { logout } from '../../services/authService';
 
 const NAV_ITEMS = [
   {
@@ -60,6 +62,25 @@ const NAV_ITEMS = [
 ];
 
 const Sidebar = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(getUser);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    const syncUser = () => setUser(getUser());
+    window.addEventListener('auth:login', syncUser);
+    window.addEventListener('auth:logout', syncUser);
+    return () => {
+      window.removeEventListener('auth:login', syncUser);
+      window.removeEventListener('auth:logout', syncUser);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    setDropdownOpen(false);
+    logout();
+    navigate('/login');
+  };
   return (
     <>
       {/* Mobile overlay */}
@@ -113,9 +134,40 @@ const Sidebar = ({ isOpen, onClose }) => {
           ))}
         </nav>
 
-        {/* Bottom user hint */}
-        <div className="px-5 py-4 border-t border-white/10">
-          <p className="text-white/30 text-xs">Admin Panel</p>
+        {/* Bottom user section */}
+        <div className="px-4 py-4 border-t border-white/10 relative">
+          <button
+            onClick={() => setDropdownOpen((v) => !v)}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition"
+          >
+            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-white/60">
+                <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+              </svg>
+            </div>
+            <div className="flex-1 text-left min-w-0">
+              <p className="text-white text-sm font-medium truncate">{user?.name || 'Admin'}</p>
+              <p className="text-white/30 text-xs truncate">{user?.email || ''}</p>
+            </div>
+            <svg viewBox="0 0 24 24" fill="currentColor" className={`w-4 h-4 text-white/30 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}>
+              <path d="M7 10l5 5 5-5H7z"/>
+            </svg>
+          </button>
+
+          {/* Dropdown */}
+          {dropdownOpen && (
+            <div className="absolute bottom-20 left-4 right-4 bg-[#0d1228] border border-white/10 rounded-xl py-1 shadow-xl">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                  <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+                </svg>
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </aside>
     </>
