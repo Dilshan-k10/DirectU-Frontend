@@ -18,6 +18,7 @@ import Analyzing from "./pages/Analyzing";
 import Overview from "./pages/admin_pages/Overview";
 import Applications from "./pages/admin_pages/Applications";
 import ApplicationDetail from "./pages/admin_pages/ApplicationDetail";
+import Degrees from './pages/admin_pages/Degrees';
 
 function AuthLogoutListener() {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ function App() {
           <Route path="applications" element={<Applications />} />
           <Route path="applications/:applicationId" element={<ApplicationDetail />} />
           {/* <Route path="users" element={<Users />} /> */}
-          {/* <Route path="degrees" element={<Degrees />} /> */}
+          <Route path="degrees" element={<Degrees />} />
           {/* <Route path="intakes" element={<Intakes />} /> */}
           {/* <Route path="settings" element={<Settings />} /> */}
         </Route>
