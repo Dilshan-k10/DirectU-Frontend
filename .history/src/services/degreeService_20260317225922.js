@@ -1,0 +1,7 @@
+import axiosClient from "../api/axiosClient";
+
+
+// getAllDegrees: Fetches a list of all degrees.
+export const getAllDegrees = async () => {
+    try {
+      const response = await axiosClient.get("/degrees");

@@ -1,56 +1,53 @@
-<<<<<<< Updated upstream
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-=======
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import MainLayout from './layouts/MainLayout';
-import AdmissionUpload from './pages/AdmissionUpload';
-import AboutUs from './pages/AboutUs';
-import Register from './pages/Register';
-import Login from './pages/Login';
-import ContactUs from './pages/ContactUs';
-import './App.css'; 
-import AdmissionResult from './pages/AdmissionResult';
-import Analyzing from './pages/Analyzing';
-import ExamPage from './pages/ExamPage';
+import React, { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+} from "react-router-dom";
+import MainLayout from "./layouts/MainLayout";
+import DashboardLayout from "./layouts/DashboardLayout";
+import AdmissionUpload from "./pages/AdmissionUpload";
+import AboutUs from "./pages/AboutUs";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
+import ContactUs from "./pages/ContactUs";
+import "./App.css";
+import AdmissionResult from "./pages/AdmissionResult";
+import Analyzing from "./pages/Analyzing";
+import Overview from "./pages/admin_pages/Overview";
+import Applications from "./pages/admin_pages/Applications";
+import ApplicationDetail from "./pages/admin_pages/ApplicationDetail";
+import Degrees from './pages/admin_pages/Degrees';
 
->>>>>>> Stashed changes
+function AuthLogoutListener() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const handler = () => navigate("/login");
+    window.addEventListener("auth:logout", handler);
+    return () => window.removeEventListener("auth:logout", handler);
+  }, [navigate]);
+  return null;
+}
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-<<<<<<< Updated upstream
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-=======
     <Router>
-      <MainLayout>
-        <Routes>
+      <AuthLogoutListener />
+      <Routes>
+        {/* ── Admin routes — DashboardLayout only, no Navbar/Footer ── */}
+        <Route path="/admin" element={<DashboardLayout />}>
+          <Route index element={<Overview />} />
+          <Route path="applications" element={<Applications />} />
+          <Route path="applications/:applicationId" element={<ApplicationDetail />} />
+          {/* <Route path="users" element={<Users />} /> */}
+          <Route path="degrees" element={<Degrees />} />
+          {/* <Route path="intakes" element={<Intakes />} /> */}
+          {/* <Route path="settings" element={<Settings />} /> */}
+        </Route>
+
+        {/* ── Public routes — MainLayout with Navbar/Footer ── */}
+        <Route element={<MainLayout />}>
           <Route path="/" element={<AdmissionUpload />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
@@ -61,11 +58,10 @@ function App() {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/exam" element={<ExamPage />} />
-        </Routes>
-      </MainLayout>
+        </Route>
+      </Routes>
     </Router>
   );
->>>>>>> Stashed changes
 }
 
-export default App
+export default App;
