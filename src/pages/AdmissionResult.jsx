@@ -292,7 +292,7 @@ const AdmissionResult = () => {
                     </div>
                     <div>
                       <p className="text-gray-500 text-sm font-semibold mb-1">DURATION</p>
-                      <p className="text-gray-900 text-base">{alternativeProgram?.duration || "Not specified"}</p>
+                      <p className="text-gray-900 text-base">{alternativeProgram?.duration || "Not specified"} "Years"</p>
                     </div>
                     <div>
                       <p className="text-gray-500 text-sm font-semibold mb-1">WHY THIS PROGRAM</p>
