@@ -101,8 +101,9 @@ const AdmissionUpload = () => {
     setErrorMsg("");
     setLoading(true);
     try {
-      await submitApplication(selectedDegree, intake?.id, file);
-      setShowSuccess(true);
+      const res = await submitApplication(selectedDegree, intake?.id, file);
+      const applicationId = res?.data?.id || res?.id;
+      setShowSuccess({ applicationId });
     } catch (err) {
       setErrorMsg(err.response?.data?.error || "Failed to submit application.");
     } finally {
@@ -137,7 +138,7 @@ const AdmissionUpload = () => {
               Your documents have been submitted for AI analysis.
             </p>
             <button
-              onClick={() => { setShowSuccess(false); navigate("/analyzing"); }}
+              onClick={() => { setShowSuccess(false); navigate('/analyzing', { state: { applicationId: showSuccess.applicationId } }); }}
               className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition text-white font-semibold py-3 rounded-xl"
             >
               Done
