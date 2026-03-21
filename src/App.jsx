@@ -20,6 +20,8 @@ import Applications from "./pages/admin_pages/Applications";
 import ApplicationDetail from "./pages/admin_pages/ApplicationDetail";
 import Degrees from './pages/admin_pages/Degrees';
 import Intakes from './pages/admin_pages/Intakes';
+import ExamPage from "./pages/ExamPage";
+
 
 function AuthLogoutListener() {
   const navigate = useNavigate();
