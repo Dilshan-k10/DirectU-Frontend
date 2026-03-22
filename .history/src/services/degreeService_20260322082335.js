@@ -36,14 +36,3 @@ export const createDegree = async (degreeData) => {
     throw error;
   }
 };
-
-// updateDegree: Updates an existing degree with the provided ID and data.
-export const updateDegree = async (degreeId, degreeData) => {
-  try {
-    const response = await axiosClient.put(`/uniadmin/degrees/${degreeId}`, degreeData);
-    return response.data.data.degree;
-  } catch (error) {
-    console.error("Error updating degree:", error);
-    throw error;
-  }
-};
