@@ -6,10 +6,9 @@ const AddIntakeModal = ({ isOpen, onClose, onSave, editingIntake }) => {
     name: "",
     startDate: "",
     deadline: "",
-    status: "Upcoming" // Default status
+    status: "Upcoming" 
   });
 
-  // Modal එක ඕපන් වෙද්දී, Edit නම් පරණ ඩේටා දාගන්නවා, නැත්නම් හිස් කරනවා.
   useEffect(() => {
     if (isOpen && editingIntake) {
       setFormData({
