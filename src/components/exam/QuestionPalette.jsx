@@ -66,7 +66,7 @@ const QuestionPalette = ({
             type="button"
             onClick={() => onSelectQuestion?.(n - 1)}
             className={[
-              'h-9 w-9 rounded-full border text-xs font-semibold transition-colors',
+              'w-6 h-6 rounded-full border text-xs font-semibold transition-colors justify-self-center',
               statusStyles(getStatus(n)),
               'hover:opacity-90',
             ].join(' ')}

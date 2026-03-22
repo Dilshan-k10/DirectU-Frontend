@@ -2,7 +2,7 @@ import axiosClient from '../api/axiosClient';
 
 export async function fetchExamQuestions(degreeId) {
   const encoded = encodeURIComponent(degreeId);
-  const response = await axiosClient.get(`/exam/questions/${encoded}`);
+  const response = await axiosClient.get(`/exam/questions/${encoded}`, { timeout: 60000 });
   return response.data;
 }
 
