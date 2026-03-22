@@ -4,21 +4,22 @@ import { FiX } from "react-icons/fi";
 const AddIntakeModal = ({ isOpen, onClose, onSave, editingIntake }) => {
   const [formData, setFormData] = useState({
     name: "",
+    year: "",
     startDate: "",
-    deadline: "",
-    status: "Upcoming" 
+    endDate: "",
   });
 
   useEffect(() => {
     if (isOpen && editingIntake) {
       setFormData({
         name: editingIntake.name || "",
-        startDate: editingIntake.startDate || "",
-        deadline: editingIntake.deadline || "",
-        status: editingIntake.status || "Upcoming"
+        year: editingIntake.year || "",
+        startDate: editingIntake.startDate ? editingIntake.startDate.slice(0, 10) : "",
+        endDate: editingIntake.endDate ? editingIntake.endDate.slice(0, 10) : "",
+        status: editingIntake.status || "Active",
       });
     } else if (isOpen && !editingIntake) {
-      setFormData({ name: "", startDate: "", deadline: "", status: "Upcoming" });
+      setFormData({ name: "", year: "", startDate: "", endDate: "" });
     }
   }, [isOpen, editingIntake]);
 
@@ -31,17 +32,15 @@ const AddIntakeModal = ({ isOpen, onClose, onSave, editingIntake }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const submittedIntake = {
-      id: editingIntake ? editingIntake.id : Date.now(),
+    const payload = {
+      ...(editingIntake && { id: editingIntake.id }),
       name: formData.name,
+      year: Number(formData.year),
       startDate: formData.startDate,
-      deadline: formData.deadline,
-      status: formData.status,
-      applicationCount: editingIntake ? editingIntake.applicationCount : 0 // අලුත් එකක applications 0යි
+      endDate: formData.endDate,
+      ...(editingIntake && { status: formData.status }),
     };
-
-    onSave(submittedIntake, !!editingIntake);
+    onSave(payload, !!editingIntake);
     onClose();
   };
 
@@ -81,6 +80,30 @@ const AddIntakeModal = ({ isOpen, onClose, onSave, editingIntake }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Year</label>
+                <input
+                  type="number" required name="year" value={formData.year} onChange={handleInputChange}
+                  placeholder="e.g. 2026"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:ring-2 focus:ring-[#6366f1]/20 focus:border-[#6366f1] outline-none transition-all"
+                />
+              </div>
+            </div>
+
+            {isEditMode && (
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                <select
+                  name="status" value={formData.status} onChange={handleInputChange}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:ring-2 focus:ring-[#6366f1]/20 focus:border-[#6366f1] outline-none transition-all"
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Start Date</label>
                 <input 
                   type="date" required name="startDate" value={formData.startDate} onChange={handleInputChange}
@@ -88,24 +111,12 @@ const AddIntakeModal = ({ isOpen, onClose, onSave, editingIntake }) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Application Deadline</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">End Date</label>
                 <input 
-                  type="date" required name="deadline" value={formData.deadline} onChange={handleInputChange}
+                  type="date" required name="endDate" value={formData.endDate} onChange={handleInputChange}
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:ring-2 focus:ring-[#6366f1]/20 focus:border-[#6366f1] outline-none transition-all"
                 />
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
-              <select 
-                name="status" value={formData.status} onChange={handleInputChange} 
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800 focus:ring-2 focus:ring-[#6366f1]/20 focus:border-[#6366f1] outline-none transition-all"
-              >
-                <option value="Upcoming">Upcoming (Not open yet)</option>
-                <option value="Active">Active (Accepting applications)</option>
-                <option value="Closed">Closed (Deadline passed)</option>
-              </select>
             </div>
 
           </form>
