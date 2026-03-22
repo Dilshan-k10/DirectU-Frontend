@@ -46,4 +46,4 @@ export const updateDegree = async (degreeId, degreeData) => {
     console.error("Error updating degree:", error);
     throw error;
   }
-};
+}

@@ -3,7 +3,6 @@ import { HiPlus } from "react-icons/hi";
 import { FiEdit2 } from "react-icons/fi";
 import AddCourseModal from "../../components/admin_components/AddCourseModal";
 import { getDegrees } from "../../services/degreeService";
-import { updateDegree } from "../../services/degreeService";
 
 const Degrees = () => {
   const [loading, setLoading] = useState(true);
@@ -18,13 +17,12 @@ const Degrees = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleToggleStatus = async (deg) => {
-    try {
-      const updated = await updateDegree(deg.id, { isActive: !deg.isActive });
-      setDegrees((prev) => prev.map((d) => d.id === updated.id ? updated : d));
-    } catch (err) {
-      console.error('Failed to update status:', err);
-    }
+  const handleToggleStatus = (id) => {
+    setDegrees((prevDegrees) =>
+      prevDegrees.map((deg) =>
+        deg.id === id ? { ...deg, isActive: !deg.isActive } : deg
+      )
+    );
   };
 
   const handleAddNewClick = () => {
@@ -39,9 +37,9 @@ const Degrees = () => {
 
   const handleSaveCourse = (savedDegree, isEdit) => {
     if (isEdit) {
-      setDegrees((prev) => prev.map((d) => d.id === savedDegree.id ? savedDegree : d));
+      setDegrees(degrees.map(d => d.id === savedDegree.id ? savedDegree : d));
     } else {
-      setDegrees((prev) => [savedDegree, ...prev]);
+      setDegrees([savedDegree, ...degrees]);
     }
   };
 
@@ -106,7 +104,7 @@ const Degrees = () => {
                       <input
                         type="checkbox"
                         checked={deg.isActive}
-                        onChange={() => handleToggleStatus(deg)}
+                        onChange={() => handleToggleStatus(deg.id)}
                         className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
