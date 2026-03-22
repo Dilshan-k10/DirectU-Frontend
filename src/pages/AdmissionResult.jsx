@@ -181,7 +181,7 @@ const AdmissionResult = () => {
       setError("");
       await reconsiderApplication(applicationId, alternativeProgramId);
       setReconsiderLocked(true);
-      navigate("/exam");
+      navigate('/exam', { state: { degreeId: alternativeProgramId } });
     } catch (e) {
       setError(e?.message || "Failed to reconsider application.");
     } finally {
@@ -205,9 +205,9 @@ const AdmissionResult = () => {
         <div className="w-full lg:w-2/3 p-10 lg:pl-16 lg:pr-8 lg:pt-10 lg:pb-8">
           {/* Loading */}
           {loading && (
-            <div className="flex flex-col items-center justify-center py-10 text-center text-white">
-              <FiLoader className="text-3xl text-accent animate-spin" />
-              <p className="text-gray-300 text-sm mt-3">Loading your result...</p>
+            <div className="fixed inset-0 flex flex-col items-center justify-center text-center z-50">
+              <div className="w-16 h-16 border-2 border-white/20 border-t-white rounded-full animate-spin mb-4" />
+              <p className="text-white/50 text-lg">Loading your result</p>
             </div>
           )}
 
@@ -228,31 +228,51 @@ const AdmissionResult = () => {
                 style={{ backgroundImage: `url(${heroImage})` }}
                 data-aos="fade-right"
               >
-                <div className="absolute top-4 right-4">
+                <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-3xl" />
+
+                <div className="relative z-10 absolute">
                   <span
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold border ${
-                      statusUi?.badgeClass || "bg-gray-50 text-gray-600 border-gray-200"
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-md mb-4 font-bold border ${
+                      statusUi?.badgeClass ||
+                      "bg-gray-50 text-gray-600 border-gray-200"
                     }`}
                   >
                     <FiAlertCircle className="text-base" />
-                    {statusUi?.badgeText || (qualification?.feedbackType ? String(qualification.feedbackType).toUpperCase() : "")}
+                    {statusUi?.badgeText ||
+                      (qualification?.feedbackType
+                        ? String(qualification.feedbackType).toUpperCase()
+                        : "")}
                   </span>
                 </div>
-                <h1 className="text-4xl font-bold text-white mb-4">{statusUi?.header || "Admission Result"}</h1>
-                <p className="text-white text-lg">Confidence Score: {confidencePercentage}%</p>
+                <div className="relative z-10">
+                  <h1 className="text-4xl font-bold text-white mb-4">
+                    {statusUi?.header || "Admission Result"}
+                  </h1>
+                  <p className="text-white text-lg font-bold">
+                    Confidence Score: {confidencePercentage}%
+                  </p>
+                </div>
               </div>
 
               {/* AI Analysis Report Card */}
-              <div className="bg-white rounded-3xl p-6 mb-8 shadow-sm border border-gray-100" data-aos="fade-up">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">AI Analysis Report</h2>
+              <div
+                className="bg-white rounded-3xl p-6 mb-8 shadow-sm border border-gray-100"
+                data-aos="fade-up"
+              >
+                <h2 className="text-xl font-bold text-gray-900 mb-4">
+                  AI Analysis Report
+                </h2>
                 <p className="text-gray-700">{qualification?.message || ""}</p>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 mb-8" data-aos="fade-up">
+              <div
+                className="flex flex-col sm:flex-row gap-4 mb-8"
+                data-aos="fade-up"
+              >
                 <button
-                  onClick={() => navigate("/generatingExam")}
-                  className="w-full sm:w-1/2 bg-gradient-to-r from-primary to-accent hover:opacity-90 transition text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2"
+                  onClick={() => navigate('/exam', { state: { degreeId: application?.programId || application?.program?.id } })}
+                  className="w-full sm:w-1/2 bg-gradient-to-r from-brand-card to-primary hover:opacity-90 transition text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2"
                 >
                   Proceed to Entrance Examination
                 </button>
@@ -264,8 +284,12 @@ const AdmissionResult = () => {
               {/* Stats Cards */}
               <div className="flex gap-4 mb-8" data-aos="fade-up">
                 <div className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex-1 text-center">
-                  <h3 className="text-sm font-semibold text-gray-600">Match Score</h3>
-                  <p className="text-2xl font-bold text-gray-900">{confidencePercentage}/100</p>
+                  <h3 className="text-sm font-semibold text-gray-600">
+                    Match Score
+                  </h3>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {confidencePercentage}/100
+                  </p>
                 </div>
                 {/* Additional stats cards can be added here if needed */}
               </div>
@@ -280,30 +304,49 @@ const AdmissionResult = () => {
               {alternatives.length > 0 ? (
                 <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
                   <img
-                    src={programImages[alternativeProgramId] || "/images/default.jpg"}
+                    src={
+                      programImages[alternativeProgramId] ||
+                      "/images/default.jpg"
+                    }
                     alt={alternativeProgramName}
                     className="w-full h-48 object-cover rounded-2xl mb-6"
                   />
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">{alternativeProgramName}</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                    {alternativeProgramName}
+                  </h3>
                   <div className="space-y-4 mb-6">
                     <div>
-                      <p className="text-gray-500 text-sm font-semibold mb-1">LEVEL</p>
-                      <p className="text-gray-900 text-base">{alternativeProgram?.level}</p>
+                      <p className="text-gray-500 text-sm font-semibold mb-1">
+                        LEVEL -{" "}
+                        <span className="text-gray-900 text-sm font-bold">
+                          {alternativeProgram?.level}
+                        </span>
+                      </p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-sm font-semibold mb-1">DURATION</p>
-                      <p className="text-gray-900 text-base">{alternativeProgram?.duration || "Not specified"} "Years"</p>
+                      <p className="text-gray-500 text-sm font-semibold mb-1">
+                        DURATION -{" "}
+                        <span className="text-gray-900 text-sm font-bold">
+                          {alternativeProgram?.duration || "Not specified"}
+                        </span>
+                      </p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-sm font-semibold mb-1">WHY THIS PROGRAM</p>
-                      <p className="text-gray-700 text-base">{alternativeReason}</p>
+                      <p className="text-gray-500 text-sm font-semibold mb-1">
+                        WHY THIS PROGRAM
+                      </p>
+                      <p className="text-gray-700 text-sm">
+                        {alternativeReason}
+                      </p>
                     </div>
                   </div>
                   <button
                     onClick={handleReconsider}
                     disabled={reconsiderLocked || reconsidering}
-                    className={`w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 ${
-                      reconsiderLocked || reconsidering ? "opacity-60 cursor-not-allowed" : ""
+                    className={`w-full bg-gradient-to-r from-brand-card to-primary  hover:opacity-90 transition text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 text-sm ${
+                      reconsiderLocked || reconsidering
+                        ? "opacity-60 cursor-not-allowed"
+                        : ""
                     }`}
                   >
                     {reconsidering ? (
@@ -318,26 +361,35 @@ const AdmissionResult = () => {
                 </div>
               ) : (
                 <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">Learn more about degree programs</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">
+                    Learn more about degree programs
+                  </h3>
                   <div className="space-y-4 mb-6">
                     {[
                       { name: "Software Engineering", id: "deg_se_001" },
                       { name: "Computer Science", id: "deg_cs_001" },
-                      { name: "Business Information Systems", id: "deg_bis_001" },
-                      { name: "Business Data Analytics", id: "deg_bda_001" }
-                    ].map(deg => (
+                      {
+                        name: "Business Information Systems",
+                        id: "deg_bis_001",
+                      },
+                      { name: "Business Data Analytics", id: "deg_bda_001" },
+                    ].map((deg) => (
                       <div key={deg.id} className="flex items-center gap-4">
                         <img
                           src={programImages[deg.id] || "/images/default.jpg"}
                           alt={deg.name}
                           className="w-12 h-12 object-cover rounded-lg"
                         />
-                        <span className="text-gray-900 font-medium">{deg.name}</span>
+                        <span className="text-gray-900 font-medium">
+                          {deg.name}
+                        </span>
                       </div>
                     ))}
                   </div>
                   <button
-                    onClick={() => window.open('https://www.example.com', '_blank')}
+                    onClick={() =>
+                      window.open("https://www.example.com", "_blank")
+                    }
                     className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition text-white font-semibold py-3 rounded-xl"
                   >
                     Visit University Website

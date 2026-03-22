@@ -10,10 +10,11 @@ import { calculateExamScore, fetchExamQuestions, submitExamAnswers } from '../se
 const ExamPage = () => {
   const location = useLocation();
 
+  // const degreeId = "deg_cs_001"; // For testing, hardcode a degreeId
+
   const degreeId = useMemo(() => {
-    const params = new URLSearchParams(location.search);
-    return params.get('degreeId') || params.get('programId') || '';
-  }, [location.search]);
+    return location.state?.degreeId || new URLSearchParams(location.search).get('degreeId') || '';
+  }, [location]);
 
   const studentId = useMemo(() => {
     const user = getUser();
@@ -29,6 +30,11 @@ const ExamPage = () => {
 
   const [submitting, setSubmitting] = useState(false);
   const [completed, setCompleted] = useState(false);
+
+  const EXAM_DURATION = 30 * 60; // 30 minutes in seconds
+  const [secondsLeft, setSecondsLeft] = useState(EXAM_DURATION);
+  const timerRef = React.useRef(null);
+  const autoSubmitRef = React.useRef(false);
 
   useEffect(() => {
     let alive = true;
@@ -111,6 +117,31 @@ const ExamPage = () => {
     setCurrentQuestionIndex((prev) => Math.max(0, prev - 1));
   };
 
+  // Start countdown on mount, auto-submit when time runs out
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setSecondsLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          if (!autoSubmitRef.current) {
+            autoSubmitRef.current = true;
+            handleSubmit();
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timerRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Stop timer once exam is done
+  useEffect(() => {
+    if (completed || submitting) clearInterval(timerRef.current);
+  }, [completed, submitting]);
+
   const handleSubmit = async () => {
     if (completed || submitting) return;
 
@@ -153,95 +184,107 @@ const ExamPage = () => {
   const isLastQuestion = total > 0 && currentQuestionIndex === total - 1;
 
   return (
-    <div className="bg-brand-dark">
-      <div className="mx-auto w-full max-w-6xl px-6 py-8">
-        <div className="rounded-2xl bg-brand-card p-4">
-          <div className="rounded-xl bg-gray-100 p-5">
-            <div className="grid grid-cols-12 gap-6">
-              {/* Left palette */}
-              <aside className="col-span-12 lg:col-span-3">
-                <QuestionPalette
-                  total={total || 10}
-                  current={currentQuestionIndex + 1}
-                  answeredNumbers={answeredNumbers}
-                  markedNumbers={[]}
-                  onSelectQuestion={handleSelectQuestion}
-                />
-              </aside>
+    <div className="bg-brand-dark min-h-screen">
+      <div className="mx-auto w-full max-w-[1400px] px-10 py-10 flex items-center justify-center min-h-[calc(100vh-80px)]">
+        <div className="rounded-xl bg-gray-100 p-10">
+          <div className="grid grid-cols-12 gap-6">
+            {/* Left palette */}
+            <aside className="col-span-12 lg:col-span-2">
+              <QuestionPalette
+                total={total || 10}
+                current={currentQuestionIndex + 1}
+                answeredNumbers={answeredNumbers}
+                markedNumbers={[]}
+                onSelectQuestion={handleSelectQuestion}
+              />
+            </aside>
 
-              {/* Center question */}
-              <section className="col-span-12 lg:col-span-6">
-                <div className="rounded-2xl bg-white p-5 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm font-semibold text-gray-700">
-                      {total ? `Question ${currentQuestionIndex + 1} of ${total}` : 'Question'}
-                    </div>
-                    <TimerBox />
+            {/* Center question */}
+            <section className="col-span-12 lg:col-span-8">
+              <div className="rounded-2xl bg-white p-8 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-semibold text-gray-700">
+                    {total
+                      ? `Question ${currentQuestionIndex + 1} of ${total}`
+                      : "Question"}
                   </div>
-
-                  {/* Progress line */}
-                  <div className="mt-3 h-1.5 w-40 max-w-full rounded-full bg-gray-200">
-                    <div
-                      className="h-1.5 rounded-full bg-accent"
-                      style={{ width: `${progressPercent}%` }}
-                    />
-                  </div>
-
-                  <div className="mt-5">
-                    {loading ? (
-                      <div className="flex h-64 items-center justify-center text-sm font-semibold text-gray-600">
-                        Loading questions...
-                      </div>
-                    ) : error ? (
-                      <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-                        {error}
-                      </div>
-                    ) : completed ? (
-                      <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm font-semibold text-green-800">
-                        Exam submitted successfully.
-                      </div>
-                    ) : currentQuestion ? (
-                      <QuestionCard
-                        questionNumber={currentQuestionIndex + 1}
-                        question={currentQuestion}
-                        selectedOption={selectedOption}
-                        disabled={submitting}
-                        onSelectOption={handleSelectOption}
-                      />
-                    ) : (
-                      <div className="text-sm text-gray-600">No questions found.</div>
-                    )}
-                  </div>
-
-                  <div className="mt-10 flex items-center justify-between">
-                    <button
-                      type="button"
-                      onClick={handlePrevious}
-                      disabled={completed || submitting || currentQuestionIndex === 0}
-                      className="flex items-center gap-2 rounded-lg border border-gray-400 bg-gray-200 px-5 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      <span className="text-base leading-none">&lsaquo;</span>
-                      Previous
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={isLastQuestion ? handleSubmit : () => setCurrentQuestionIndex((p) => p + 1)}
-                      disabled={completed || submitting || total === 0}
-                      className="flex items-center gap-2 rounded-lg bg-primary px-7 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {isLastQuestion ? (submitting ? 'Submitting...' : 'Submit') : 'Next'}
-                      <span className="text-base leading-none">&rsaquo;</span>
-                    </button>
-                  </div>
+                  <TimerBox secondsLeft={secondsLeft} />
                 </div>
-              </section>
 
-              {/* Right instructions */}
-              <aside className="col-span-12 lg:col-span-3">
-                <InstructionsPanel />
-              </aside>
-            </div>
+                {/* Progress line */}
+                <div className="mt-3 h-1.5 w-40 max-w-full rounded-full bg-gray-200">
+                  <div
+                    className="h-1.5 rounded-full bg-accent"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+
+                <div className="mt-5">
+                  {loading ? (
+                    <div className="flex h-64 items-center justify-center text-sm font-semibold text-gray-600">
+                      Loading questions...
+                    </div>
+                  ) : error ? (
+                    <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                      {error}
+                    </div>
+                  ) : completed ? (
+                    <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm font-semibold text-green-800">
+                      Exam submitted successfully.
+                    </div>
+                  ) : currentQuestion ? (
+                    <QuestionCard
+                      questionNumber={currentQuestionIndex + 1}
+                      question={currentQuestion}
+                      selectedOption={selectedOption}
+                      disabled={submitting}
+                      onSelectOption={handleSelectOption}
+                    />
+                  ) : (
+                    <div className="text-sm text-gray-600">
+                      No questions found.
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-10 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={handlePrevious}
+                    disabled={
+                      completed || submitting || currentQuestionIndex === 0
+                    }
+                    className="flex items-center gap-2 rounded-lg border border-gray-400 bg-gray-200 px-5 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    <span className="text-base leading-none">&lsaquo;</span>
+                    Previous
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={
+                      isLastQuestion
+                        ? handleSubmit
+                        : () => setCurrentQuestionIndex((p) => p + 1)
+                    }
+                    disabled={completed || submitting || total === 0}
+                    className="flex items-center gap-2 rounded-lg bg-primary px-7 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isLastQuestion
+                      ? submitting
+                        ? "Submitting..."
+                        : "Submit"
+                      : "Next"}
+                    <span className="text-base leading-none">&rsaquo;</span>
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            {/* Right instructions */}
+            <aside className="col-span-12 lg:col-span-2">
+              <InstructionsPanel />
+            </aside>
           </div>
         </div>
       </div>
