@@ -3,7 +3,6 @@ import { HiPlus } from "react-icons/hi";
 import { FiEdit2 } from "react-icons/fi";
 import AddCourseModal from "../../components/admin_components/AddCourseModal";
 import { getDegrees } from "../../services/degreeService";
-import { updateDegree } from "../../services/degreeService";
 
 const Degrees = () => {
   const [loading, setLoading] = useState(true);
@@ -18,13 +17,12 @@ const Degrees = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleToggleStatus = async (deg) => {
-    try {
-      const updated = await updateDegree(deg.id, { isActive: !deg.isActive });
-      setDegrees((prev) => prev.map((d) => d.id === updated.id ? updated : d));
-    } catch (err) {
-      console.error('Failed to update status:', err);
-    }
+  const handleToggleStatus = (id) => {
+    setDegrees((prevDegrees) =>
+      prevDegrees.map((deg) =>
+        deg.id === id ? { ...deg, isActive: !deg.isActive } : deg
+      )
+    );
   };
 
   const handleAddNewClick = () => {
@@ -39,32 +37,32 @@ const Degrees = () => {
 
   const handleSaveCourse = (savedDegree, isEdit) => {
     if (isEdit) {
-      setDegrees((prev) => prev.map((d) => d.id === savedDegree.id ? savedDegree : d));
+      setDegrees(degrees.map(d => d.id === savedDegree.id ? savedDegree : d));
     } else {
-      setDegrees((prev) => [savedDegree, ...prev]);
+      setDegrees([savedDegree, ...degrees]);
     }
   };
 
   return (
     <div className="max-w-7xl mx-auto relative">
+      
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-1">Degrees</h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-1">Degrees</h1>
         <p className="text-gray-500 text-sm">
           Manage your university degree programs and their active status.
         </p>
       </div>
 
       <div className="bg-brand-light rounded-2xl shadow-sm p-8">
+        
         <div className="flex justify-between items-center pb-5 mb-6 border-b border-gray-200">
-          <h2 className="text-gray-700 font-semibold text-lg">
-            Degree Programs
-          </h2>
-          <button
+          <h2 className="text-gray-700 font-semibold text-">Degree Programs</h2>
+          <button 
             onClick={handleAddNewClick}
-            className="bg-primary hover:bg-brand-card text-white flex items-center gap-2 px-5 py-2.5 rounded-xl transition font-semibold text-sm shadow-md shadow-[#6366f1]/20"
+            className="bg-[#6366f1] text-white flex items-center gap-2 px-5 py-2.5 rounded-xl hover:bg-[#4f46e5] transition font-semibold text-sm shadow-md shadow-[#6366f1]/20"
           >
             <HiPlus className="w-4 h-4" />
-            Add New Programme
+            Add New Course
           </button>
         </div>
 
@@ -76,26 +74,16 @@ const Degrees = () => {
             </div>
           ) : (
             degrees.map((deg) => (
-              <div
-                key={deg.id}
-                className={`bg-[#1a1f36] rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border transition duration-300 ${deg.isActive ? "border-transparent shadow-lg" : "border-gray-700 opacity-60"}`}
+              <div 
+                key={deg.id} 
+                className={`bg-[#1a1f36] rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border transition duration-300 ${deg.isActive ? 'border-transparent shadow-lg' : 'border-gray-700 opacity-60'}`}
               >
                 <div className="flex-grow">
-                  <div className="text-white mb-4">{ deg.id}</div>
-                  <h3
-                    className={`text-xl font-bold mb-1.5 transition flex items-center gap-2 ${deg.isActive ? "text-white" : "text-gray-400"}`}
-                  >
+                  <h3 className={`text-xl font-bold mb-1.5 transition flex items-center gap-2 ${deg.isActive ? 'text-white' : 'text-gray-400'}`}>
                     {deg.name}
-                    <span className="text-xs font-normal px-2 py-1 bg-white/10 rounded-md text-gray-300">
-                      {deg.level} | {deg.duration} YRS
-                    </span>
-                    <span className="text-xs font-normal px-2 py-1 bg-white/10 rounded-md text-gray-300">
-                      CAPACITY | {deg.capacity} SEATS
-                    </span>
+                    <span className="text-xs font-normal px-2 py-1 bg-white/10 rounded-md text-gray-300">{deg.level} | {deg.duration} yrs</span>
                   </h3>
-                  <p
-                    className={`text-sm font-normal tracking-wide transition ${deg.isActive ? "text-gray-400" : "text-gray-600"}`}
-                  >
+                  <p className={`text-sm font-normal tracking-wide transition ${deg.isActive ? 'text-gray-400' : 'text-gray-600'}`}>
                     {deg.description}
                   </p>
                 </div>
@@ -103,22 +91,17 @@ const Degrees = () => {
                 <div className="flex items-center justify-between md:justify-end gap-6 md:min-w-[280px] flex-shrink-0">
                   <div className="flex items-center gap-3">
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={deg.isActive}
-                        onChange={() => handleToggleStatus(deg)}
-                        className="sr-only peer"
+                      <input 
+                        type="checkbox" checked={deg.isActive} onChange={() => handleToggleStatus(deg.id)} className="sr-only peer" 
                       />
-                      <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                      <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#6366f1]"></div>
                     </label>
-                    <span
-                      className={`text-sm font-semibold w-16 ${deg.isActive ? "text-emerald-500" : "text-gray-500"}`}
-                    >
-                      {deg.isActive ? "Active" : "Hidden"}
+                    <span className={`text-sm font-semibold w-16 ${deg.isActive ? 'text-emerald-500' : 'text-gray-500'}`}>
+                      {deg.isActive ? 'Active' : 'Hidden'}
                     </span>
                   </div>
-
-                  <button
+                  
+                  <button 
                     onClick={() => handleEditClick(deg)}
                     className="text-gray-400 hover:text-[#6366f1] transition p-2 rounded-lg hover:bg-white/5"
                   >
@@ -131,15 +114,17 @@ const Degrees = () => {
         </div>
       </div>
 
-      <AddCourseModal
-        isOpen={isModalOpen}
+
+      <AddCourseModal 
+        isOpen={isModalOpen} 
         onClose={() => {
           setIsModalOpen(false);
-          setEditingCourse(null);
-        }}
-        onSave={handleSaveCourse}
+          setEditingCourse(null); 
+        }} 
+        onSave={handleSaveCourse} 
         editingCourse={editingCourse}
       />
+
     </div>
   );
 };

@@ -3,7 +3,6 @@ import { HiPlus } from "react-icons/hi";
 import { FiEdit2 } from "react-icons/fi";
 import AddCourseModal from "../../components/admin_components/AddCourseModal";
 import { getDegrees } from "../../services/degreeService";
-import { updateDegree } from "../../services/degreeService";
 
 const Degrees = () => {
   const [loading, setLoading] = useState(true);
@@ -18,13 +17,12 @@ const Degrees = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleToggleStatus = async (deg) => {
-    try {
-      const updated = await updateDegree(deg.id, { isActive: !deg.isActive });
-      setDegrees((prev) => prev.map((d) => d.id === updated.id ? updated : d));
-    } catch (err) {
-      console.error('Failed to update status:', err);
-    }
+  const handleToggleStatus = (id) => {
+    setDegrees((prevDegrees) =>
+      prevDegrees.map((deg) =>
+        deg.id === id ? { ...deg, isActive: !deg.isActive } : deg
+      )
+    );
   };
 
   const handleAddNewClick = () => {
@@ -39,9 +37,9 @@ const Degrees = () => {
 
   const handleSaveCourse = (savedDegree, isEdit) => {
     if (isEdit) {
-      setDegrees((prev) => prev.map((d) => d.id === savedDegree.id ? savedDegree : d));
+      setDegrees(degrees.map(d => d.id === savedDegree.id ? savedDegree : d));
     } else {
-      setDegrees((prev) => [savedDegree, ...prev]);
+      setDegrees([savedDegree, ...degrees]);
     }
   };
 
@@ -64,7 +62,7 @@ const Degrees = () => {
             className="bg-primary hover:bg-brand-card text-white flex items-center gap-2 px-5 py-2.5 rounded-xl transition font-semibold text-sm shadow-md shadow-[#6366f1]/20"
           >
             <HiPlus className="w-4 h-4" />
-            Add New Programme
+            Add New Course
           </button>
         </div>
 
@@ -81,7 +79,7 @@ const Degrees = () => {
                 className={`bg-[#1a1f36] rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border transition duration-300 ${deg.isActive ? "border-transparent shadow-lg" : "border-gray-700 opacity-60"}`}
               >
                 <div className="flex-grow">
-                  <div className="text-white mb-4">{ deg.id}</div>
+                  <div className="text-grey-700">{ deg.id}</div>
                   <h3
                     className={`text-xl font-bold mb-1.5 transition flex items-center gap-2 ${deg.isActive ? "text-white" : "text-gray-400"}`}
                   >
@@ -106,7 +104,7 @@ const Degrees = () => {
                       <input
                         type="checkbox"
                         checked={deg.isActive}
-                        onChange={() => handleToggleStatus(deg)}
+                        onChange={() => handleToggleStatus(deg.id)}
                         className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
