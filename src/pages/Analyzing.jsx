@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const STEPS = [
   'Reading academic transcript...',
@@ -42,6 +42,8 @@ const CARDS = [
 
 const Analyzing = () => {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const applicationId = state?.applicationId;
   const [stepIndex, setStepIndex] = useState(0);
 
   useEffect(() => {
@@ -49,10 +51,11 @@ const Analyzing = () => {
       setStepIndex((i) => (i + 1) % STEPS.length);
     }, 2000);
 
-    // const navTimer = setTimeout(() => navigate('/results'), 7000);
+    const navTimer = setTimeout(() => navigate(`/result/${applicationId}`), 7000);
 
     return () => {
       clearInterval(stepTimer);
+      clearTimeout(navTimer);
     };
   }, [navigate]);
 
