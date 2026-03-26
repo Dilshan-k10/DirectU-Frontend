@@ -2,42 +2,21 @@ import React, { useState, useEffect } from "react";
 import { HiPlus } from "react-icons/hi";
 import { FiEdit2, FiCalendar, FiUsers, FiClock } from "react-icons/fi";
 import AddIntakeModal from "../../components/admin_components/AddIntakeModal";
+import { getAllIntakes, createIntake, updateIntake } from "../../services/intakeService";
 
 const Intakes = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingIntake, setEditingIntake] = useState(null);
   
-  // Mock Data
-  const [intakes, setIntakes] = useState([
-    {
-      id: 1,
-      name: "2026 September Intake",
-      startDate: "2026-06-01",
-      deadline: "2026-08-15",
-      status: "Active", // Active, Upcoming, Closed
-      applicationCount: 342
-    },
-    {
-      id: 2,
-      name: "2027 February Intake",
-      startDate: "2026-11-01",
-      deadline: "2027-01-20",
-      status: "Upcoming",
-      applicationCount: 0
-    },
-    {
-      id: 3,
-      name: "2026 February Intake",
-      startDate: "2025-11-01",
-      deadline: "2026-01-20",
-      status: "Closed",
-      applicationCount: 415
-    }
-  ]);
+
+  const [intakes, setIntakes] = useState([]);
 
   useEffect(() => {
-    setLoading(false); 
+    getAllIntakes()
+      .then((data) => setIntakes(data))
+      .catch((err) => console.error('Failed to load intakes:', err))
+      .finally(() => setLoading(false));
   }, []);
 
   const handleAddNewClick = () => {
@@ -50,19 +29,26 @@ const Intakes = () => {
     setIsModalOpen(true);
   };
 
-  const handleSaveIntake = (savedIntake, isEdit) => {
-    if (isEdit) {
-      setIntakes(intakes.map(i => i.id === savedIntake.id ? savedIntake : i));
-    } else {
-      setIntakes([savedIntake, ...intakes]);
+  const handleSaveIntake = async (formData, isEdit) => {
+    try {
+      if (isEdit) {
+        const updated = await updateIntake(formData.id, formData);
+        setIntakes((prev) => prev.map((i) => i.id === updated.id ? updated : i));
+      } else {
+        const created = await createIntake(formData);
+        setIntakes((prev) => [created, ...prev]);
+      }
+    } catch (err) {
+      console.error('Failed to save intake:', err);
     }
   };
-
-  // Status එකට අනුව Badge එකේ පාට වෙනස් කරන Function එක
+  
   const getStatusBadge = (status) => {
     switch(status) {
       case 'Active':
         return <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]">Active</span>;
+      case 'Inactive':
+        return <span className="px-3 py-1 rounded-full text-xs font-bold bg-orange-500/10 text-orange-400 border border-orange-500/20">Inactive</span>;
       case 'Upcoming':
         return <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">Upcoming</span>;
       case 'Closed':
@@ -108,7 +94,7 @@ const Intakes = () => {
             intakes.map((intake) => (
               <div 
                 key={intake.id} 
-                className={`bg-[#1a1f36] rounded-2xl p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6 border transition duration-300 ${intake.status === 'Closed' ? 'border-gray-700 opacity-75' : 'border-transparent shadow-lg'}`}
+                className={`bg-[#1a1f36] rounded-2xl p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-6 border transition duration-300 ${intake.status === 'Inactive' || intake.status === 'Closed' ? 'border-gray-700 opacity-60' : 'border-transparent shadow-lg'}`}
               >
                 
                 {/* Left: Name & Status */}
@@ -118,13 +104,18 @@ const Intakes = () => {
                     {getStatusBadge(intake.status)}
                   </div>
                   
-                  {/* Stats Badge */}
-                  <div className="inline-flex items-center gap-2 mt-2 px-3 py-1.5 bg-white/5 rounded-lg border border-white/5">
-                    <FiUsers className="text-[#6366f1]" />
-                    <span className="text-sm font-medium text-gray-300">
-                      <strong className="text-white">{intake.applicationCount}</strong> Total Applications
-                    </span>
-                  </div>
+                  {intake.status === 'Active' && (
+                    <div className="inline-flex items-center gap-2 mt-2 px-3 py-1.5 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                      <FiUsers className="text-emerald-400" />
+                      <span className="text-sm font-medium text-emerald-300">Active Intake</span>
+                    </div>
+                  )}
+                  {intake.status === 'Inactive' && (
+                    <div className="inline-flex items-center gap-2 mt-2 px-3 py-1.5 bg-orange-500/10 rounded-lg border border-orange-500/20">
+                      <FiUsers className="text-orange-400" />
+                      <span className="text-sm font-medium text-orange-300">Inactive Intake</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Right: Dates & Actions */}
@@ -134,11 +125,11 @@ const Intakes = () => {
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2 text-sm text-gray-400">
                       <FiCalendar className="text-gray-500" />
-                      <span>Starts: <strong className="text-gray-200 font-medium">{intake.startDate}</strong></span>
+                      <span>Starts: <strong className="text-gray-200 font-medium">{new Date(intake.startDate).toLocaleDateString()}</strong></span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-400">
                       <FiClock className={intake.status === 'Active' ? 'text-red-400' : 'text-gray-500'} />
-                      <span>Deadline: <strong className={intake.status === 'Active' ? 'text-red-400 font-semibold' : 'text-gray-200 font-medium'}>{intake.deadline}</strong></span>
+                      <span>Ends: <strong className={intake.status === 'Active' ? 'text-red-400 font-semibold' : 'text-gray-200 font-medium'}>{new Date(intake.endDate).toLocaleDateString()}</strong></span>
                     </div>
                   </div>
 
