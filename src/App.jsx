@@ -21,6 +21,7 @@ import ApplicationDetail from "./pages/admin_pages/ApplicationDetail";
 import Degrees from './pages/admin_pages/Degrees';
 import Intakes from './pages/admin_pages/Intakes';
 import ExamPage from "./pages/ExamPage";
+import ExamResult from "./pages/ExamResult";
 
 function AuthLogoutListener() {
   const navigate = useNavigate();
@@ -60,6 +61,7 @@ function App() {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/exam" element={<ExamPage />} />
+          <Route path="/exam-result" element={<ExamResult />} />
         </Route>
       </Routes>
     </Router>
