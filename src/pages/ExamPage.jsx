@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getUser } from '../api/axiosClient';
 import QuestionCard from '../components/exam/QuestionCard';
 import QuestionPalette from '../components/exam/QuestionPalette';
@@ -9,6 +9,7 @@ import { calculateExamScore, fetchExamQuestions, submitExamAnswers } from '../se
 
 const ExamPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   // const degreeId = "deg_cs_001"; // For testing, hardcode a degreeId
 
@@ -174,6 +175,7 @@ const ExamPage = () => {
       await calculateExamScore({ studentId, degreeId });
 
       setCompleted(true);
+      navigate('/exam-result');
     } catch (e) {
       setError(e?.message || 'Failed to submit exam answers.');
     } finally {
