@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getApplications, viewApplicationById, getApplicantExamDetails, getApplicantanalysisResultById, getApplicantanalysisFeedbackById } from '../../services/applicationService';
+import { getApplications, viewApplicationById } from '../../services/applicationService';
 
 const STATUS_STYLES = {
   qualified:     'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
@@ -24,9 +24,6 @@ const ApplicationDetail = () => {
   const [loading, setLoading] = useState(true);
   const [pdfUrl, setPdfUrl] = useState(null);
   const [pdfLoading, setPdfLoading] = useState(false);
-  const [examData, setExamData] = useState(null);
-  const [analysisData, setAnalysisData] = useState(null);
-  const [feedbackData, setFeedbackData] = useState(null);
 
   useEffect(() => {
     getApplications()
@@ -36,27 +33,6 @@ const ApplicationDetail = () => {
       })
       .catch((err) => console.error('Failed to fetch application:', err))
       .finally(() => setLoading(false));
-  }, [applicationId]);
-
-  useEffect(() => {
-    if (!applicationId) return;
-    getApplicantanalysisFeedbackById(applicationId)
-      .then((res) => setFeedbackData(res.data.data))
-      .catch((err) => console.error('Failed to fetch feedback:', err));
-  }, [applicationId]);
-
-  useEffect(() => {
-    if (!applicationId) return;
-    getApplicantanalysisResultById(applicationId)
-      .then((res) => setAnalysisData(res.data.data))
-      .catch((err) => console.error('Failed to fetch analysis data:', err));
-  }, [applicationId]);
-
-  useEffect(() => {
-    if (!applicationId) return;
-    getApplicantExamDetails(applicationId)
-      .then((res) => setExamData(res.data.exam))
-      .catch((err) => console.error('Failed to fetch exam details:', err));
   }, [applicationId]);
 
   useEffect(() => {
@@ -136,31 +112,12 @@ const ApplicationDetail = () => {
               Application Status
             </h2>
           </div>
-          <div>
-            <span
-              className={`ml-auto px-3 py-1.5 rounded-full text-lg font-semibold capitalize ${STATUS_STYLES[app.status] || "bg-white/10 text-white/50"}`}
-            >
-              {app.status.replace("_", " ")}
-            </span>
-            {analysisData && (
-              <div className="flex items-center justify-between mt-4">
-                <p className="text-white/40 text-xs uppercase tracking-wider">
-                  Confidence Score
-                </p>
-                <p
-                  className={`text-3xl font-bold ${
-                    parseFloat(analysisData.confidenceScore) >= 0.7
-                      ? "text-emerald-400"
-                      : parseFloat(analysisData.confidenceScore) >= 0.4
-                        ? "text-yellow-400"
-                        : "text-red-400"
-                  }`}
-                >
-                  {(parseFloat(analysisData.confidenceScore) * 100).toFixed(0)}%
-                </p>
-              </div>
-            )}
-          </div>
+
+          <span
+            className={`ml-auto px-3 py-1.5 rounded-full text-lg font-semibold capitalize ${STATUS_STYLES[app.status] || "bg-white/10 text-white/50"}`}
+          >
+            {app.status.replace("_", " ")}
+          </span>
         </div>
         {/* Applicant Info */}
         <div className="flex-3 bg-brand-card rounded-2xl p-8">
@@ -216,7 +173,7 @@ const ApplicationDetail = () => {
       {/* AI results */}
       <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6">
         <div className="bg-brand-light rounded-2xl p-8 mt-10">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-full bg-[#1e3a8a] flex items-center justify-center">
               <svg
                 viewBox="0 0 24 24"
@@ -226,20 +183,9 @@ const ApplicationDetail = () => {
                 <path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
               </svg>
             </div>
-            <div className="grid grid-cols-2 gap-4 w-full ">
-              <div className="">
-                <h2 className="text-gray-700 font-semibold">
-                  Analysis Results
-                </h2>
-              </div>
-              <div>
-                {feedbackData && (
-                  <p className="text-gray-500 text-md">
-                    {feedbackData.message}
-                  </p>
-                )}
-              </div>
-            </div>
+            <h2 className="text-gray-700 font-semibold text-base">
+              Analysis Results
+            </h2>
           </div>
         </div>
         <div className="bg-brand-light rounded-2xl p-8 mt-10">
@@ -253,31 +199,9 @@ const ApplicationDetail = () => {
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z" />
               </svg>
             </div>
-            <div className="flex items-center justify-between w-full">
-              <div>
-                <h2 className="text-gray-700 font-semibold text-base">
-                  Test Marks
-                </h2>
-                <p className="text-gray-400 text-xs mt-0.5">Obtained Marks</p>
-              </div>
-              <div>
-                {examData != null ? (
-                  <p
-                    className={`text-3xl font-bold ${
-                      examData.obtainedMarks >= 70
-                        ? "text-emerald-500"
-                        : examData.obtainedMarks >= 40
-                          ? "text-yellow-500"
-                          : "text-red-500"
-                    }`}
-                  >
-                    {examData.obtainedMarks}/100
-                  </p>
-                ) : (
-                  <p className="text-gray-400 text-sm">No Test Marks</p>
-                )}
-              </div>
-            </div>
+            <h2 className="text-gray-700 font-semibold text-base">
+              Score
+            </h2>
           </div>
         </div>
       </div>

@@ -157,7 +157,7 @@ export const getApplicantanalysisResultById = async (applicationId) => {
 }
 
 // get analysis feedback bi id: Fetches the analysis feedback for a specific application by its ID.
-export const getApplicantanalysisFeedbackById = async (applicationId) => {
+export const getApplicantanalysisFeedbackById = async (applicationId) => { 
   try {
     const response = await axiosClient.get(`uniadmin/analysisFeedback/${applicationId}`, { responseType: 'json' });
     return { data: response.data };
@@ -165,4 +165,3 @@ export const getApplicantanalysisFeedbackById = async (applicationId) => {
     console.error(`Error fetching analysis feedback:`, error);
     throw error;
   }
-};

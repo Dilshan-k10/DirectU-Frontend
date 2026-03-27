@@ -227,16 +227,12 @@ const ApplicationDetail = () => {
               </svg>
             </div>
             <div className="grid grid-cols-2 gap-4 w-full ">
-              <div className="">
-                <h2 className="text-gray-700 font-semibold">
-                  Analysis Results
-                </h2>
+              <div className='items-'>
+                <h2 className="text-gray-700 font-semibold text-base ">Analysis Results</h2>
               </div>
               <div>
                 {feedbackData && (
-                  <p className="text-gray-500 text-md">
-                    {feedbackData.message}
-                  </p>
+                  <p className="text-gray-500 text-md">{feedbackData.message}</p>
                 )}
               </div>
             </div>
