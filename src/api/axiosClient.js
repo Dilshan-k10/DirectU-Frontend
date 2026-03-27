@@ -4,13 +4,7 @@ const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 10000,
   headers: { "Content-Type": "application/json" },
-});
-
-// Attach accessToken to every request
-axiosClient.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem("accessToken");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
+  withCredentials: true, // send cookies automatically
 });
 
 // On 401, attempt silent refresh then retry original request
@@ -27,45 +21,32 @@ axiosClient.interceptors.response.use(
   async (error) => {
     const original = error.config;
 
-    const hasToken = sessionStorage.getItem("accessToken");
-    if (error.response?.status === 401 && !original._retry && hasToken) {
+    if (error.response?.status === 401 && !original._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
-          .then((token) => {
-            original.headers.Authorization = `Bearer ${token}`;
-            return axiosClient(original);
-          })
+          .then(() => axiosClient(original))
           .catch((err) => Promise.reject(err));
       }
 
       original._retry = true;
       isRefreshing = true;
 
-      const refreshToken = sessionStorage.getItem("refreshToken");
-
-      if (!refreshToken) {
-        isRefreshing = false;
-        clearTokens();
-        window.dispatchEvent(new Event("auth:logout"));
-        return Promise.reject(error);
-      }
-
       try {
-        const { data } = await axios.post(
+        console.log("[Auth] 401 detected, attempting token refresh...");
+        await axios.post(
           `${import.meta.env.VITE_API_BASE_URL}/auth/refresh`,
-          { refreshToken }
+          {},
+          { withCredentials: true }
         );
-        const newAccessToken = data.accessToken;
-        sessionStorage.setItem("accessToken", newAccessToken);
-        axiosClient.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
-        processQueue(null, newAccessToken);
-        original.headers.Authorization = `Bearer ${newAccessToken}`;
+        console.log("[Auth] Token refreshed successfully, retrying...");
+        processQueue(null);
         return axiosClient(original);
       } catch (refreshError) {
+        console.log("[Auth] Refresh failed:", refreshError.response?.data ?? refreshError.message);
         processQueue(refreshError, null);
-        clearTokens();
+        clearUser();
         window.dispatchEvent(new Event("auth:logout"));
         return Promise.reject(refreshError);
       } finally {
@@ -77,15 +58,11 @@ axiosClient.interceptors.response.use(
   }
 );
 
-export const saveTokens = (accessToken, refreshToken, user) => {
-  sessionStorage.setItem("accessToken", accessToken);
-  sessionStorage.setItem("refreshToken", refreshToken);
+export const saveUser = (user) => {
   sessionStorage.setItem("user", JSON.stringify(user));
 };
 
-export const clearTokens = () => {
-  sessionStorage.removeItem("accessToken");
-  sessionStorage.removeItem("refreshToken");
+export const clearUser = () => {
   sessionStorage.removeItem("user");
 };
 
