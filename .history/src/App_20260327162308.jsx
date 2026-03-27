@@ -54,7 +54,7 @@ function App() {
           <Route path="/" element={<AdmissionUpload />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/profile" element={<ApplicantProfile />} />
+          <Route path="/profile/:applicantId" element={<ApplicantProfile />} />
           <Route path="/result/:applicationId" element={<AdmissionResult />} />
           {/* <Route path="/result" element={<AdmissionResult />} /> */}
           <Route path="/not-qualified" element={<AdmissionResult />} />
