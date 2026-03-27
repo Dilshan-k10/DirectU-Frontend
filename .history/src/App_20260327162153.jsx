@@ -21,8 +21,6 @@ import ApplicationDetail from "./pages/admin_pages/ApplicationDetail";
 import Degrees from './pages/admin_pages/Degrees';
 import Intakes from './pages/admin_pages/Intakes';
 import ExamPage from "./pages/ExamPage";
-import ApplicantProfile from "./pages/ApplicantProfile";
-import ExamResult from "./pages/ExamResult";
 
 function AuthLogoutListener() {
   const navigate = useNavigate();
@@ -55,7 +53,7 @@ function App() {
           <Route path="/" element={<AdmissionUpload />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/profile" element={<ApplicantProfile />} />
+          <Route path
           <Route path="/result/:applicationId" element={<AdmissionResult />} />
           {/* <Route path="/result" element={<AdmissionResult />} /> */}
           <Route path="/not-qualified" element={<AdmissionResult />} />
@@ -63,7 +61,6 @@ function App() {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/exam" element={<ExamPage />} />
-          <Route path="/exam-result" element={<ExamResult />} />
         </Route>
       </Routes>
     </Router>
