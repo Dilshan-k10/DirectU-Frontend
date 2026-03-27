@@ -59,9 +59,7 @@ const Navbar = () => {
       <div className="hidden md:flex items-center space-x-5 relative">
         <button
           className="bg-primary text-white px-6 py-2 rounded-full hover:bg-primary-hover transition shadow-sm"
-          onClick={() =>
-            window.open("https://www.projectdirectu.com/", "_blank")
-          }
+          onClick={navigator("https://www.projectdirectu.com/")}
         >
           Learn More
         </button>
