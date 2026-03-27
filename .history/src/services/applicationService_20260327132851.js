@@ -145,10 +145,9 @@ export const viewApplicationById = async (applicationId) => {
 };
 
 // get analysis Data
-export const getApplicantanalysisResultById = async (applicationId) => { 
+export const getApplicantanalysisResultById = async () => { 
   try {
-    const response = await axiosClient.get(`uniadmin/analysisResults/${applicationId}`, { responseType: 'json' });
-    return { data: response.data };
+    const response = await axiosClient.get(`/analysis/applications`, { responseType: 'json' });
     
   } catch (error) {
     console.error(`Error fetching analysis data:`, error);

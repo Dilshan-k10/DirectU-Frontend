@@ -26,8 +26,7 @@ export async function calculateExamScore({ studentId, degreeId }) {
 
 export async function getApplicantExamDetails(applicationId) {
   try {
-    const response = await axiosClient.get(`/applicants/${applicationId}/exam`);
-    return response.data;
+    const response = await axiosClient.get(`/exam/applicant-details/${applicationId}`);
     
   } catch (error) {
     console.error('Error fetching applicant exam details:', error);

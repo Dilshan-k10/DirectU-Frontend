@@ -136,20 +136,12 @@ const ApplicationDetail = () => {
             </span>
             {analysisData && (
               <div className="flex items-center justify-between mt-4">
-                <p className="text-white/40 text-xs uppercase tracking-wider">
-                  Confidence Score
-                </p>
-                <p
-                  className={`text-3xl font-bold ${
-                    parseFloat(analysisData.confidenceScore) >= 0.7
-                      ? "text-emerald-400"
-                      : parseFloat(analysisData.confidenceScore) >= 0.4
-                        ? "text-yellow-400"
-                        : "text-red-400"
-                  }`}
-                >
-                  {(parseFloat(analysisData.confidenceScore) * 100).toFixed(0)}%
-                </p>
+                <p className="text-white/40 text-xs uppercase tracking-wider">Confidence Score</p>
+                <p className={`text-3xl font-bold ${
+                  parseFloat(analysisData.confidenceScore) >= 0.7 ? 'text-emerald-400' :
+                  parseFloat(analysisData.confidenceScore) >= 0.4 ? 'text-yellow-400' :
+                  'text-red-400'
+                }`}>{(parseFloat(analysisData.confidenceScore) * 100).toFixed(0)}%</p>
               </div>
             )}
           </div>
@@ -236,15 +228,13 @@ const ApplicationDetail = () => {
             </div>
             <div className="flex items-center justify-between w-full">
               <div>
-                <h2 className="text-gray-700 font-semibold text-base">
-                  Test Marks
-                </h2>
+                <h2 className="text-gray-700 font-semibold text-base">Test </h2>
                 <p className="text-gray-400 text-xs mt-0.5">Obtained Marks</p>
               </div>
               <div>
                 {examData != null ? (
                   <p
-                    className={`text-3xl font-bold ${
+                    className={`text-4xl font-bold ${
                       examData.obtainedMarks >= 70
                         ? "text-emerald-500"
                         : examData.obtainedMarks >= 40
@@ -252,7 +242,7 @@ const ApplicationDetail = () => {
                           : "text-red-500"
                     }`}
                   >
-                    {examData.obtainedMarks}/100
+                    {examData.obtainedMarks}
                   </p>
                 ) : (
                   <p className="text-gray-400 text-sm">—</p>

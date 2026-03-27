@@ -244,15 +244,15 @@ const ApplicationDetail = () => {
               <div>
                 {examData != null ? (
                   <p
-                    className={`text-3xl font-bold ${
+                    className={`text-4xl font-bold ${
                       examData.obtainedMarks >= 70
                         ? "text-emerald-500"
                         : examData.obtainedMarks >= 40
                           ? "text-yellow-500"
                           : "text-red-500"
-                    }`}
+                    } /100`}
                   >
-                    {examData.obtainedMarks}/100
+                    {examData.obtainedMarks}
                   </p>
                 ) : (
                   <p className="text-gray-400 text-sm">—</p>

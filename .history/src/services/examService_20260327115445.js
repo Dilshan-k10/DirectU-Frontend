@@ -16,22 +16,21 @@ export async function submitExamAnswers({ studentId, degreeId, answers }) {
 }
 
 export async function calculateExamScore({ studentId, degreeId }) {
-  const response = await axiosClient.post('/exam/calculate-score', {
-    studentId,
-    degreeId,
-  });
-  return response.data;
-}
-
-
-export async function getApplicantExamDetails(applicationId) {
   try {
-    const response = await axiosClient.get(`/applicants/${applicationId}/exam`);
+    const response = await axiosClient.post('/exam/calculate-score', {
+      studentId,
+      degreeId,
+    });
     return response.data;
-    
   } catch (error) {
-    console.error('Error fetching applicant exam details:', error);
+    console.error('Error calculating exam score:', error);
     throw error;
   }
 }
-  
+
+
+
+export async function getApplicantExamDetails(applicationId) {
+  const response = await axiosClient.get(`/applicants/${applicationId}/exam`);
+  return response.data;
+}

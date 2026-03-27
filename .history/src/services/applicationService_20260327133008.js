@@ -147,7 +147,7 @@ export const viewApplicationById = async (applicationId) => {
 // get analysis Data
 export const getApplicantanalysisResultById = async (applicationId) => { 
   try {
-    const response = await axiosClient.get(`uniadmin/analysisResults/${applicationId}`, { responseType: 'json' });
+    const response = await axiosClient.get(`/analysisResults/${applicationId}`, { responseType: 'json' });
     return { data: response.data };
     
   } catch (error) {
