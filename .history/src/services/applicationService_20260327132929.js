@@ -144,10 +144,10 @@ export const viewApplicationById = async (applicationId) => {
   }
 };
 
-// get analysis Data by application ID: Fetches the analysis results for a specific application by its ID.
-export const getApplicantanalysisResultById = async (applicationId) => { 
+// get analysis Data
+export const getApplicantanalysisResultById = async () => { 
   try {
-    const response = await axiosClient.get(`uniadmin/analysisResults/${applicationId}`, { responseType: 'json' });
+    const response = await axiosClient.get(`/analysis/applications`, { responseType: 'json' });
     return { data: response.data };
     
   } catch (error) {
@@ -155,14 +155,3 @@ export const getApplicantanalysisResultById = async (applicationId) => {
     throw error;
   }
 }
-
-// get analysis feedback bi id: Fetches the analysis feedback for a specific application by its ID.
-export const getApplicantanalysisFeedbackById = async (applicationId) => {
-  try {
-    const response = await axiosClient.get(`uniadmin/analysisFeedback/${applicationId}`, { responseType: 'json' });
-    return { data: response.data };
-  } catch (error) {
-    console.error(`Error fetching analysis feedback:`, error);
-    throw error;
-  }
-};
