@@ -216,7 +216,7 @@ const ApplicationDetail = () => {
       {/* AI results */}
       <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6">
         <div className="bg-brand-light rounded-2xl p-8 mt-10">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-full bg-[#1e3a8a] flex items-center justify-center">
               <svg
                 viewBox="0 0 24 24"
@@ -226,17 +226,13 @@ const ApplicationDetail = () => {
                 <path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
               </svg>
             </div>
-            <div className="grid grid-cols-2 gap-4 w-full ">
-              <div className="">
-                <h2 className="text-gray-700 font-semibold">
-                  Analysis Results
-                </h2>
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <div>
+                <h2 className="text-gray-700 font-semibold text-base">Analysis Results</h2>
               </div>
               <div>
                 {feedbackData && (
-                  <p className="text-gray-500 text-md">
-                    {feedbackData.message}
-                  </p>
+                  <p className="text-gray-500 text-md">{feedbackData.message}</p>
                 )}
               </div>
             </div>
@@ -274,7 +270,7 @@ const ApplicationDetail = () => {
                     {examData.obtainedMarks}/100
                   </p>
                 ) : (
-                  <p className="text-gray-400 text-sm">No Test Marks</p>
+                  <p className="text-gray-400 text-sm"></p>
                 )}
               </div>
             </div>

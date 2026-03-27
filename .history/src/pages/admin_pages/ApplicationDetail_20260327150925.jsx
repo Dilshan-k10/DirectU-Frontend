@@ -227,7 +227,7 @@ const ApplicationDetail = () => {
               </svg>
             </div>
             <div className="grid grid-cols-2 gap-4 w-full ">
-              <div className="">
+              <div className="tems-center justify-center">
                 <h2 className="text-gray-700 font-semibold">
                   Analysis Results
                 </h2>

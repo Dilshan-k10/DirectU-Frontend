@@ -216,7 +216,7 @@ const ApplicationDetail = () => {
       {/* AI results */}
       <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6">
         <div className="bg-brand-light rounded-2xl p-8 mt-10">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-full bg-[#1e3a8a] flex items-center justify-center">
               <svg
                 viewBox="0 0 24 24"
@@ -227,8 +227,8 @@ const ApplicationDetail = () => {
               </svg>
             </div>
             <div className="grid grid-cols-2 gap-4 w-full ">
-              <div className="">
-                <h2 className="text-gray-700 font-semibold">
+              <div>
+                <h2 className="text-gray-700 font-semibold text-base tems-center justify-center">
                   Analysis Results
                 </h2>
               </div>
