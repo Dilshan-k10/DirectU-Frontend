@@ -171,6 +171,8 @@ const AdmissionResult = () => {
     (alternativeProgramName || alternativeProgramDescription),
   );
 
+  const [pendingExamDegreeId, setPendingExamDegreeId] = useState(null);
+
   const handleReconsider = async () => {
     if (reconsiderLocked || reconsidering) return;
     if (!alternativeProgramId) {
@@ -183,7 +185,9 @@ const AdmissionResult = () => {
       setError("");
       await reconsiderApplication(applicationId, alternativeProgramId);
       setReconsiderLocked(true);
-      navigate('/exam', { state: { degreeId: alternativeProgramId } });
+      setPendingExamDegreeId(alternativeProgramId);
+      setAgreedToRules(false);
+      setShowExamModal(true);
     } catch (e) {
       setError(e?.message || "Failed to reconsider application.");
     } finally {
@@ -273,7 +277,11 @@ const AdmissionResult = () => {
                 data-aos="fade-up"
               >
                 <button
-                  onClick={() => setShowExamModal(true)}
+                  onClick={() => {
+                    setPendingExamDegreeId(application?.programId || application?.program?.id);
+                    setAgreedToRules(false);
+                    setShowExamModal(true);
+                  }}
                   className="w-full sm:w-1/2 bg-gradient-to-r from-brand-card to-primary hover:opacity-90 transition text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2"
                 >
                   Proceed to Entrance Examination
@@ -444,7 +452,7 @@ const AdmissionResult = () => {
                 onClick={() => {
                   if (!agreedToRules) return;
                   setShowExamModal(false);
-                  navigate('/exam', { state: { degreeId: application?.programId || application?.program?.id } });
+                  navigate('/exam', { state: { degreeId: pendingExamDegreeId } });
                 }}
                 disabled={!agreedToRules}
                 className={`flex-1 bg-green-500 hover:bg-green-600 transition text-white font-semibold py-3 rounded-xl text-sm ${
