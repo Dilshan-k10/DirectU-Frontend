@@ -96,6 +96,8 @@ const AdmissionResult = () => {
   const [resultData, setResultData] = useState(null);
   const [reconsidering, setReconsidering] = useState(false);
   const [reconsiderLocked, setReconsiderLocked] = useState(false);
+  const [showExamModal, setShowExamModal] = useState(false);
+  const [agreedToRules, setAgreedToRules] = useState(false);
 
   useEffect(() => {
     AOS.init({
@@ -271,7 +273,7 @@ const AdmissionResult = () => {
                 data-aos="fade-up"
               >
                 <button
-                  onClick={() => navigate('/exam', { state: { degreeId: application?.programId || application?.program?.id } })}
+                  onClick={() => setShowExamModal(true)}
                   className="w-full sm:w-1/2 bg-gradient-to-r from-brand-card to-primary hover:opacity-90 transition text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2"
                 >
                   Proceed to Entrance Examination
@@ -400,6 +402,61 @@ const AdmissionResult = () => {
           )}
         </div>
       </div>
+
+      {/* Exam Rules Modal */}
+      {showExamModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-brand-dark border border-white/10 rounded-3xl p-8 max-w-lg w-full mx-4 shadow-2xl">
+            <h2 className="text-2xl font-bold text-white mb-2">Entrance Examination Rules</h2>
+            <p className="text-white/60 text-sm mb-6">Please read the following rules carefully before proceeding.</p>
+            <ul className="space-y-3 mb-6">
+              {[
+                "This exam is based on your selected course to assess your knowledge and suitability.",
+                "The exam has a fixed duration. The timer starts immediately and auto-submits when time ends.",
+                "You may navigate between questions, and answers will be saved automatically.",
+                "Do not refresh, leave the page, or use external help. Any violation may lead to disqualification.",
+                "Use a stable internet connection and a supported browser (preferably Chrome) on a laptop/desktop.",
+                "Your answers will be evaluated and ranked. By proceeding, you agree to follow all rules.",
+              ].map((rule, i) => (
+                <li key={i} className="flex items-start gap-3 text-white/80 text-sm">
+                  <span className="text-primary mt-0.5 flex-shrink-0">✦</span>
+                  <span>{rule}</span>
+                </li>
+              ))}
+            </ul>
+            <label className="flex items-center gap-3 mb-6 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={agreedToRules}
+                onChange={(e) => setAgreedToRules(e.target.checked)}
+                className="w-4 h-4 accent-green-500 cursor-pointer"
+              />
+              <span className="text-white/80 text-sm">I agree to the rules</span>
+            </label>
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShowExamModal(false); setAgreedToRules(false); }}
+                className="flex-1 bg-white/10 hover:bg-white/20 transition text-white font-semibold py-3 rounded-xl text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (!agreedToRules) return;
+                  setShowExamModal(false);
+                  navigate('/exam', { state: { degreeId: application?.programId || application?.program?.id } });
+                }}
+                disabled={!agreedToRules}
+                className={`flex-1 bg-green-500 hover:bg-green-600 transition text-white font-semibold py-3 rounded-xl text-sm ${
+                  !agreedToRules ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                Start Exam
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
