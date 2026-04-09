@@ -7,36 +7,52 @@ import InstructionsPanel from '../components/exam/InstructionsPanel';
 import TimerBox from '../components/exam/TimerBox';
 import { calculateExamScore, fetchExamQuestions, submitExamAnswers } from '../services/examService';
 
+/**
+ * ExamPage Component
+ * Manages the entire exam-taking experience including:
+ * - Loading and displaying questions
+ * - Tracking user answers
+ * - Countdown timer (30 minutes)
+ * - Auto-submit when time runs out
+ * - Submitting answers to the server
+ */
 const ExamPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   // const degreeId = "deg_cs_001"; // For testing, hardcode a degreeId
 
+  // Extract degreeId from navigation state or URL search params
   const degreeId = useMemo(() => {
     return location.state?.degreeId || new URLSearchParams(location.search).get('degreeId') || '';
   }, [location]);
 
+  // Retrieve the current logged-in student's ID from user data
   const studentId = useMemo(() => {
     const user = getUser();
     return user?.id ?? user?._id ?? '';
   }, []);
 
+  // UI state for loading and error handling
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Exam data and user progress tracking
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answersByQuestionId, setAnswersByQuestionId] = useState({});
 
+  // Submission state and completion status
   const [submitting, setSubmitting] = useState(false);
   const [completed, setCompleted] = useState(false);
 
+  // Timer state: 30 minutes (1800 seconds) for exam duration
   const EXAM_DURATION = 30 * 60; // 30 minutes in seconds
   const [secondsLeft, setSecondsLeft] = useState(EXAM_DURATION);
   const timerRef = React.useRef(null);
   const autoSubmitRef = React.useRef(false);
 
+  // Fetch exam questions for the selected degree when component mounts or degreeId changes
   useEffect(() => {
     let alive = true;
 
@@ -52,9 +68,11 @@ const ExamPage = () => {
         setLoading(true);
         setError('');
 
+        // Fetch questions from the exam service
         const payload = await fetchExamQuestions(degreeId);
         const apiQuestions = payload?.data?.questions ?? [];
 
+        // Normalize questions to have consistent structure with just id, text, and options
         const normalized = apiQuestions.map((q) => ({
           id: q.id,
           questionText: q.questionText,
@@ -79,17 +97,20 @@ const ExamPage = () => {
     };
   }, [degreeId]);
 
+  // Derived exam data
   const total = questions.length;
   const currentQuestion = useMemo(
     () => questions[currentQuestionIndex] ?? null,
     [questions, currentQuestionIndex],
   );
 
+  // Get the user's selected answer for the current question
   const selectedOption = useMemo(() => {
     if (!currentQuestion) return null;
     return answersByQuestionId[currentQuestion.id] ?? null;
   }, [answersByQuestionId, currentQuestion]);
 
+  // Track which question numbers have been answered for the palette
   const answeredNumbers = useMemo(() => {
     return questions.reduce((acc, q, idx) => {
       if (answersByQuestionId[q.id]) acc.push(idx + 1);
@@ -97,8 +118,10 @@ const ExamPage = () => {
     }, []);
   }, [questions, answersByQuestionId]);
 
+  // Calculate progress percentage for visual progress bar
   const progressPercent = total ? ((currentQuestionIndex + 1) / total) * 100 : 0;
 
+  // Store the user's selected option (A, B, C, or D) for the current question
   const handleSelectOption = (optionLetter) => {
     if (!currentQuestion || completed || submitting) return;
     setAnswersByQuestionId((prev) => ({
@@ -107,23 +130,26 @@ const ExamPage = () => {
     }));
   };
 
+  // Navigate to a specific question when clicked in the question palette
   const handleSelectQuestion = (index) => {
     if (completed || submitting) return;
     if (index < 0 || index >= total) return;
     setCurrentQuestionIndex(index);
   };
 
+  // Move to the previous question
   const handlePrevious = () => {
     if (completed || submitting) return;
     setCurrentQuestionIndex((prev) => Math.max(0, prev - 1));
   };
 
-  // Start countdown on mount, auto-submit when time runs out
+  // Initialize countdown timer: decrements every second and auto-submits when time expires
   useEffect(() => {
     timerRef.current = setInterval(() => {
       setSecondsLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timerRef.current);
+          // Prevent multiple auto-submit attempts
           if (!autoSubmitRef.current) {
             autoSubmitRef.current = true;
             handleSubmit();
@@ -138,11 +164,12 @@ const ExamPage = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Stop timer once exam is done
+  // Stop timer once exam is completed or being submitted
   useEffect(() => {
     if (completed || submitting) clearInterval(timerRef.current);
   }, [completed, submitting]);
 
+  // Submit exam answers to the server and calculate score
   const handleSubmit = async () => {
     if (completed || submitting) return;
 
@@ -155,6 +182,7 @@ const ExamPage = () => {
       return;
     }
 
+    // Format answers for submission: filter out unanswered questions and uppercase option letters
     const answers = Object.entries(answersByQuestionId)
       .filter(([, v]) => v)
       .map(([questionId, selectedAnswer]) => ({
@@ -171,10 +199,13 @@ const ExamPage = () => {
       setSubmitting(true);
       setError('');
 
+      // Submit answers to server
       await submitExamAnswers({ studentId, degreeId, answers });
+      // Calculate final score based on answers
       await calculateExamScore({ studentId, degreeId });
 
       setCompleted(true);
+      // Redirect to results page
       navigate('/exam-result');
     } catch (e) {
       setError(e?.message || 'Failed to submit exam answers.');
@@ -189,8 +220,9 @@ const ExamPage = () => {
     <div className="bg-brand-dark min-h-screen">
       <div className="mx-auto w-full max-w-[1400px] px-10 py-10 flex items-center justify-center min-h-[calc(100vh-80px)]">
         <div className="rounded-xl bg-gray-100 p-10">
+          {/* Three-column layout: Question Palette | Question Card | Instructions */}
           <div className="grid grid-cols-12 gap-6">
-            {/* Left palette */}
+            {/* Left sidebar: Question palette showing all questions and answer status */}
             <aside className="col-span-12 lg:col-span-2">
               <QuestionPalette
                 total={total || 10}
@@ -201,9 +233,10 @@ const ExamPage = () => {
               />
             </aside>
 
-            {/* Center question */}
+            {/* Main content: Question display, timer, and navigation buttons */}
             <section className="col-span-12 lg:col-span-8">
               <div className="rounded-2xl bg-white p-8 shadow-sm">
+                {/* Question number and timer display */}
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-semibold text-gray-700">
                     {total
@@ -213,7 +246,7 @@ const ExamPage = () => {
                   <TimerBox secondsLeft={secondsLeft} />
                 </div>
 
-                {/* Progress line */}
+                {/* Visual progress indicator */}
                 <div className="mt-3 h-1.5 w-40 max-w-full rounded-full bg-gray-200">
                   <div
                     className="h-1.5 rounded-full bg-accent"
@@ -221,6 +254,7 @@ const ExamPage = () => {
                   />
                 </div>
 
+                {/* Question content: shows loading state, errors, completion message, or actual question */}
                 <div className="mt-5">
                   {loading ? (
                     <div className="flex h-64 items-center justify-center text-sm font-semibold text-gray-600">
@@ -249,6 +283,7 @@ const ExamPage = () => {
                   )}
                 </div>
 
+                {/* Navigation buttons: Previous, Next/Submit */}
                 <div className="mt-10 flex items-center justify-between">
                   <button
                     type="button"
@@ -262,6 +297,7 @@ const ExamPage = () => {
                     Previous
                   </button>
 
+                  {/* Button changes to Submit when on last question */}
                   <button
                     type="button"
                     onClick={
@@ -283,7 +319,7 @@ const ExamPage = () => {
               </div>
             </section>
 
-            {/* Right instructions */}
+            {/* Right sidebar: Exam instructions and guidelines */}
             <aside className="col-span-12 lg:col-span-2">
               <InstructionsPanel />
             </aside>
