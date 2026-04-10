@@ -118,7 +118,7 @@ const Intakes = () => {
                   )}
                 </div>
 
-                {/* Right: Dates & Actions */}
+                {/*Dates & Actions */}
                 <div className="flex flex-wrap md:flex-nowrap items-center gap-6 lg:gap-10">
                   
                   {/* Dates Info */}
