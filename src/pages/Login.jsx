@@ -4,6 +4,7 @@ import logo from '../assets/logo.png';
 import { login } from '../services/authService';
 import FieldError from '../components/FieldError';
 import { validators, validateLoginForm } from '../utils/validation';
+import { getApplications } from '../services/applicationService';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -38,7 +39,19 @@ const Login = () => {
     setLoading(true);
     try {
       const res = await login(form.email, form.password);
-      navigate(res.data?.role === 'ADMIN' ? '/admin' : '/');
+      if (res.data?.role === 'ADMIN') {
+        navigate('/admin');
+        return;
+      }
+      const candidateId = res.data?.id;
+      try {
+        const appsRes = await getApplications();
+        const applications = appsRes?.data?.data ?? [];
+        const hasApplication = applications.some(app => app.candidateId === candidateId);
+        navigate(hasApplication ? '/profile' : '/');
+      } catch {
+        navigate('/');
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password");
     } finally {
