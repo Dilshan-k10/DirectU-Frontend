@@ -48,7 +48,9 @@ const Login = () => {
         const appsRes = await getApplications();
         const applications = appsRes?.data?.data ?? [];
         const hasApplication = applications.some(app => app.candidateId === candidateId);
-        navigate(hasApplication ? '/profile' : '/');
+        navigate(hasApplication ? '/profile' : '/', {
+          state: hasApplication ? { applicationId: applications.find(app => app.candidateId === candidateId)?.id } : undefined
+        });
       } catch {
         navigate('/');
       }

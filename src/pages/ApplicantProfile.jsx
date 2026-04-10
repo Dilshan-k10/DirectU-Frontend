@@ -1,17 +1,12 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-
-const dummy = {
-  id: '2fb1a13f-35a4-4883-8987-cd0941e117b2',
-  status: 'qualified',
-  confidenceScore: '0.50',
-  candidate: { name: 'Sandeepa', email: 'sandeepa.20234079@iit.ac.lk', id: '19f8a074-8045-4d83-87b5-1ab68c2fa9ab' },
-  program: { name: 'Software Engineering', level: 'BACHELOR' },
-  intake: { name: 'January 2026 Intake', year: '2026' },
-  appliedAt: '2026-03-27T12:25:54.000Z',
-  feedback: 'You meet the minimum requirements for the selected degree program.',
-  obtainedMarks: 30,
-};
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import {
+  getApplications,
+  viewApplicationById,
+  getApplicantExamDetails,
+  getApplicantanalysisResultById,
+  getApplicantanalysisFeedbackById,
+} from '../services/applicationService';
 
 const STATUS_STYLES = {
   qualified:     'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
@@ -38,10 +33,87 @@ const IconBox = ({ path }) => (
 
 const ApplicantProfile = () => {
   const navigate = useNavigate();
-  const app = dummy;
+  const location = useLocation();
+  const applicationId = location.state?.applicationId || sessionStorage.getItem('examApplicationId') || '';
 
-  const scoreColor = app.obtainedMarks >= 70 ? 'text-emerald-500' : app.obtainedMarks >= 40 ? 'text-yellow-500' : 'text-red-500';
-  const confColor = parseFloat(app.confidenceScore) >= 0.7 ? 'text-emerald-400' : parseFloat(app.confidenceScore) >= 0.4 ? 'text-yellow-400' : 'text-red-400';
+  const [app, setApp] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [examData, setExamData] = useState(null);
+  const [analysisData, setAnalysisData] = useState(null);
+  const [feedbackData, setFeedbackData] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [pdfLoading, setPdfLoading] = useState(false);
+
+  useEffect(() => {
+    if (!applicationId) { setLoading(false); return; }
+    getApplications()
+      .then((res) => {
+        const found = res.data.data.find((a) => a.id === applicationId);
+        setApp(found || null);
+      })
+      .catch((err) => console.error('Failed to fetch application:', err))
+      .finally(() => setLoading(false));
+  }, [applicationId]);
+
+  useEffect(() => {
+    if (!applicationId) return;
+    getApplicantanalysisFeedbackById(applicationId)
+      .then((res) => setFeedbackData(res.data.data))
+      .catch((err) => console.error('Failed to fetch feedback:', err));
+  }, [applicationId]);
+
+  useEffect(() => {
+    if (!applicationId) return;
+    getApplicantanalysisResultById(applicationId)
+      .then((res) => setAnalysisData(res.data.data))
+      .catch((err) => console.error('Failed to fetch analysis data:', err));
+  }, [applicationId]);
+
+  useEffect(() => {
+    if (!applicationId) return;
+    getApplicantExamDetails(applicationId)
+      .then((res) => setExamData(res.data.exam))
+      .catch((err) => console.error('Failed to fetch exam details:', err));
+  }, [applicationId]);
+
+  useEffect(() => {
+    if (!applicationId) return;
+    let objectUrl;
+    const loadPdf = async () => {
+      setPdfLoading(true);
+      try {
+        const { data } = await viewApplicationById(applicationId);
+        objectUrl = URL.createObjectURL(data);
+        setPdfUrl(objectUrl);
+      } catch (err) {
+        console.error('Failed to load PDF:', err);
+      } finally {
+        setPdfLoading(false);
+      }
+    };
+    loadPdf();
+    return () => { if (objectUrl) URL.revokeObjectURL(objectUrl); };
+  }, [applicationId]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-3">
+        <div className="w-10 h-10 border-4 border-brand-card border-t-transparent rounded-full animate-spin" />
+        <p className="text-gray-500 text-sm">Loading profile...</p>
+      </div>
+    );
+  }
+
+  if (!app) {
+    return (
+      <div className="text-center py-20">
+        <p className="text-gray-400 text-sm">Application not found.</p>
+        <button onClick={() => navigate('/')} className="mt-4 text-blue-400 text-sm hover:underline">
+          ← Go Back
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8">
@@ -51,16 +123,12 @@ const ApplicantProfile = () => {
           <h1 className="text-2xl font-bold text-gray-800">Applicant Profile</h1>
           <p className="text-gray-400 text-xs mt-0.5">ID: {app.id}</p>
         </div>
-
-        {/* Submit Another Application */}
-      <div className="flex justify-end">
         <button
           onClick={() => navigate('/')}
           className="px-8 py-3 rounded-full font-semibold text-white text-sm shadow-md transition bg-brand-border hover:bg-brand-card"
         >
           Submit Another Application
         </button>
-      </div>
       </div>
 
       {/* Top 3 cards */}
@@ -74,12 +142,18 @@ const ApplicantProfile = () => {
           <span className={`px-3 py-1.5 rounded-full text-lg font-semibold capitalize ${STATUS_STYLES[app.status] || 'bg-white/10 text-white/50'}`}>
             {app.status.replace('_', ' ')}
           </span>
-          <div className="flex items-center justify-between mt-4">
-            <p className="text-white/40 text-xs uppercase tracking-wider">Confidence Score</p>
-            <p className={`text-lg font-bold ${confColor}`}>
-              {(parseFloat(app.confidenceScore) * 100).toFixed(0)}%
-            </p>
-          </div>
+          {analysisData && (
+            <div className="flex items-center justify-between mt-4">
+              <p className="text-white/40 text-xs uppercase tracking-wider">Confidence Score</p>
+              <p className={`text-3xl font-bold ${
+                parseFloat(analysisData.confidenceScore) >= 0.7 ? 'text-emerald-400'
+                : parseFloat(analysisData.confidenceScore) >= 0.4 ? 'text-yellow-400'
+                : 'text-red-400'
+              }`}>
+                {(parseFloat(analysisData.confidenceScore) * 100).toFixed(0)}%
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Applicant Info */}
@@ -89,9 +163,9 @@ const ApplicantProfile = () => {
             <h2 className="text-white font-semibold text-base">Applicant Information</h2>
           </div>
           <div className="grid grid-cols-1 gap-6">
-            <Field label="Full Name" value={app.candidate.name} />
-            <Field label="Email" value={app.candidate.email} />
-            <Field label="Candidate ID" value={app.candidate.id} />
+            <Field label="Full Name" value={app.candidate?.name} />
+            <Field label="Email" value={app.candidate?.email} />
+            <Field label="Candidate ID" value={app.candidateId} />
           </div>
         </div>
 
@@ -102,10 +176,10 @@ const ApplicantProfile = () => {
             <h2 className="text-white font-semibold text-base">Application Information</h2>
           </div>
           <div className="grid grid-cols-2 gap-6">
-            <Field label="Programme" value={app.program.name} />
-            <Field label="Level" value={app.program.level} />
-            <Field label="Intake" value={app.intake.name} />
-            <Field label="Intake Year" value={app.intake.year} />
+            <Field label="Programme" value={app.program?.name} />
+            <Field label="Level" value={app.program?.level} />
+            <Field label="Intake" value={app.intake?.name} />
+            <Field label="Intake Year" value={app.intake?.year} />
             <Field label="Applied At" value={new Date(app.appliedAt).toLocaleString()} />
           </div>
         </div>
@@ -121,7 +195,9 @@ const ApplicantProfile = () => {
                 <h2 className="text-gray-700 font-semibold text-base">Analysis Results</h2>
               </div>
               <div>
-                <p className="text-gray-500 text-sm">{app.feedback}</p>
+                {feedbackData && (
+                  <p className="text-gray-500 text-sm">{feedbackData.message}</p>
+                )}
               </div>
             </div>
           </div>
@@ -135,22 +211,38 @@ const ApplicantProfile = () => {
                 <h2 className="text-gray-700 font-semibold text-base">Test Marks</h2>
                 <p className="text-gray-400 text-xs mt-0.5">Obtained Marks</p>
               </div>
-              <p className={`text-4xl font-bold ${scoreColor}`}>{app.obtainedMarks}/100</p>
+              {examData != null ? (
+                <p className={`text-4xl font-bold ${
+                  examData.obtainedMarks >= 70 ? 'text-emerald-500'
+                  : examData.obtainedMarks >= 40 ? 'text-yellow-500'
+                  : 'text-red-500'
+                }`}>
+                  {examData.obtainedMarks}/100
+                </p>
+              ) : (
+                <p className="text-gray-400 text-sm">No Test Marks</p>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Submitted Document placeholder */}
+      {/* Submitted Document */}
       <div className="bg-brand-light rounded-2xl p-8">
         <div className="flex items-center gap-3 mb-6">
           <IconBox path="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z" />
           <h2 className="text-gray-700 font-semibold text-base">Submitted Document</h2>
         </div>
-        <p className="text-gray-400 text-sm text-center py-10">No document available.</p>
+        {pdfLoading ? (
+          <div className="flex items-center justify-center h-40">
+            <div className="w-6 h-6 border-2 border-gray-300/30 border-t-gray-600 rounded-full animate-spin" />
+          </div>
+        ) : pdfUrl ? (
+          <iframe src={pdfUrl} className="w-full h-[700px] rounded-xl border border-white/10" />
+        ) : (
+          <p className="text-gray-400 text-sm text-center py-10">No document available.</p>
+        )}
       </div>
-
-      
     </div>
   );
 };
