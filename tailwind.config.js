@@ -22,8 +22,8 @@ export default {
           hover: '#1e3c66',
         },
         accent: {
-          DEFAULT: '#8C52FF',
-          hover: '#7455F6',
+          DEFAULT: '#6124dacc',
+          hover: '#826ae4',
         }
       }
     },
