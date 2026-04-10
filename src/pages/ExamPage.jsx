@@ -46,15 +46,30 @@ const ExamPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [completed, setCompleted] = useState(false);
 
-  // Anti-cheat: warning banner shown inside the UI
+  // Anti-cheat: violation tracking
+  const MAX_VIOLATIONS = 3;
+  const [violationCount, setViolationCount] = useState(0);
   const [warning, setWarning] = useState('');
   const violationCountRef = React.useRef(0);
+  // Ref to always hold the latest handleViolation without stale closures in event listeners
+  const handleViolationRef = React.useRef(null);
 
-  const showWarning = (msg) => {
+  const handleViolation = (reason) => {
+    if (completed || submitting) return;
     violationCountRef.current += 1;
-    setWarning(`⚠️ ${msg} (Violation #${violationCountRef.current})`);
+    const current = violationCountRef.current;
+    console.warn(`Violation: ${reason} (${current}/${MAX_VIOLATIONS})`);
+    setViolationCount(current);
+    setWarning(`⚠️ Violation detected (${current} / ${MAX_VIOLATIONS}): ${reason}`);
     setTimeout(() => setWarning(''), 4000);
+    if (current >= MAX_VIOLATIONS) {
+      alert('Maximum violations reached. Submitting exam.');
+      handleSubmit();
+    }
   };
+
+  // Keep ref in sync so event listeners always call the latest version
+  handleViolationRef.current = handleViolation;
 
   // Timer state: 30 minutes (1800 seconds) for exam duration
   const EXAM_DURATION = 30 * 60; // 30 minutes in seconds
@@ -73,8 +88,8 @@ const ExamPage = () => {
 
   useEffect(() => {
     const onFullscreenChange = () => {
-      if (!document.fullscreenElement && !completed) {
-        showWarning('You exited fullscreen. This is recorded.');
+      if (!document.fullscreenElement) {
+        handleViolationRef.current('Exited fullscreen');
         setTimeout(() => {
           document.documentElement.requestFullscreen().catch(() => {});
         }, 500);
@@ -82,21 +97,16 @@ const ExamPage = () => {
     };
     document.addEventListener('fullscreenchange', onFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [completed]);
+  }, []);
 
   // ── Anti-cheat: Tab switching ────────────────────────────────────────────────
   useEffect(() => {
     const onVisibilityChange = () => {
-      if (document.hidden && !completed) {
-        console.warn('User switched tab');
-        showWarning('Tab switching detected. This is recorded.');
-      }
+      if (document.hidden) handleViolationRef.current('Tab switched');
     };
     document.addEventListener('visibilitychange', onVisibilityChange);
     return () => document.removeEventListener('visibilitychange', onVisibilityChange);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [completed]);
+  }, []);
 
   // ── Anti-cheat: Right-click & keyboard shortcuts ─────────────────────────────
   useEffect(() => {
@@ -109,7 +119,7 @@ const ExamPage = () => {
         (e.ctrlKey && e.key === 'R');
       if (blocked) {
         e.preventDefault();
-        showWarning('Action blocked during exam.');
+        handleViolationRef.current('Attempted refresh');
       }
     };
 
@@ -119,7 +129,6 @@ const ExamPage = () => {
       document.removeEventListener('contextmenu', onContextMenu);
       document.removeEventListener('keydown', onKeyDown);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── localStorage: restore saved answers on mount ─────────────────────────────
@@ -343,8 +352,19 @@ const ExamPage = () => {
 
                 {/* Anti-cheat warning banner */}
                 {warning && (
-                  <div className="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700">
-                    {warning}
+                  <div className="mt-3 rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700">
+                    <div className="flex items-center justify-between">
+                      <span>{warning}</span>
+                      <span className="ml-4 text-xs font-bold text-red-500">
+                        {violationCount}/{MAX_VIOLATIONS}
+                      </span>
+                    </div>
+                    <div className="mt-1.5 h-1 w-full rounded-full bg-red-200">
+                      <div
+                        className="h-1 rounded-full bg-red-500 transition-all"
+                        style={{ width: `${(violationCount / MAX_VIOLATIONS) * 100}%` }}
+                      />
+                    </div>
                   </div>
                 )}
 
