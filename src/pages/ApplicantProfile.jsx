@@ -46,17 +46,21 @@ const ApplicantProfile = () => {
   return (
     <div className="p-8">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-white/40 hover:text-white text-sm transition">
-          <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-          </svg>
-          Back
-        </button>
+      <div className="flex items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Applicant Profile</h1>
           <p className="text-gray-400 text-xs mt-0.5">ID: {app.id}</p>
         </div>
+
+        {/* Submit Another Application */}
+      <div className="flex justify-end">
+        <button
+          onClick={() => navigate('/')}
+          className="px-8 py-3 rounded-full font-semibold text-white text-sm shadow-md transition bg-brand-border hover:bg-brand-card"
+        >
+          Submit Another Application
+        </button>
+      </div>
       </div>
 
       {/* Top 3 cards */}
@@ -145,6 +149,8 @@ const ApplicantProfile = () => {
         </div>
         <p className="text-gray-400 text-sm text-center py-10">No document available.</p>
       </div>
+
+      
     </div>
   );
 };

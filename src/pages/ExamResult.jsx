@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getApplicantExamDetails } from "../services/examService";
 
 const ExamResult = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const applicationId = location.state?.applicationId || sessionStorage.getItem('examApplicationId') || '';
 
   const [score, setScore] = useState(null);
@@ -122,7 +123,9 @@ const ExamResult = () => {
             {/* Action Button */}
             <div className="flex justify-center pt-2">
               <button
-                onClick={() => {}}
+                onClick={() => {
+                  navigate('/profile');
+                }}
                 className="px-10 py-3 rounded-full font-semibold text-white text-sm shadow-md transition hover:bg-brand-card bg-brand-border"
               >
                 View Profile
