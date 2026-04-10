@@ -1,29 +1,61 @@
-import React from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-
-// TODO: Replace with API response value
-const score = 82;
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { getApplicantExamDetails } from "../services/examService";
 
 const ExamResult = () => {
+  const location = useLocation();
+  const applicationId = location.state?.applicationId || sessionStorage.getItem('examApplicationId') || '';
+
+  const [score, setScore] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    console.log('[ExamResult] applicationId:', applicationId);
+    if (!applicationId) {
+      console.warn('[ExamResult] No applicationId in navigation state');
+      setLoading(false);
+      return;
+    }
+    let alive = true;
+    const run = async () => {
+      try {
+        const res = await getApplicantExamDetails(applicationId);
+        console.log('[ExamResult] API response:', res);
+        if (!alive) return;
+        const obtained = res?.data?.exam?.obtainedMarks ?? null;
+        console.log('[ExamResult] obtainedMarks:', obtained);
+        setScore(obtained);
+      } catch (e) {
+        console.error('[ExamResult] API error:', e);
+        if (!alive) return;
+        setError(e?.message || 'Failed to load exam result.');
+      } finally {
+        if (!alive) return;
+        setLoading(false);
+      }
+    };
+    run();
+    return () => { alive = false; };
+  }, [applicationId]);
+
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#0A1035" }}>
+    <div className="min-h-screen flex flex-col bg-brand-card">
 
 
       <main className="flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-2xl bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
+        <div className="w-full max-w-2xl bg-white rounded-3xl shadow-lg overflow-hidden">
 
           {/* Header */}
-          <div className="px-8 pt-10 pb-6 text-center" style={{ background: "linear-gradient(135deg, #011f4b 0%, #03396c 60%, #005b96 100%)" }}>
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 mb-4">
+          <div className="px-8 pt-10 pb-6 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-card mb-4">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">Entrance Exam Completed!</h1>
-            <p className="text-[#b3cde0] text-sm">
-              We have successfully recorded your exam answers for{" "}
-              <span className="font-semibold text-white">BSc (Hons) in Computer Science</span>.
+            <h1 className="text-3xl font-bold text-brand-card mb-2">Entrance Exam Completed!</h1>
+            <p className="text-brand-card text-sm">
+              We have successfully recorded your exam answers.
             </p>
           </div>
 
@@ -34,7 +66,9 @@ const ExamResult = () => {
               {/* Score Card */}
               <div className="rounded-2xl border border-[#b3cde0] bg-[#f0f6fb] p-5 text-center">
                 <p className="text-xs font-bold tracking-widest text-[#005b96] mb-2">YOUR SCORE</p>
-                <p className="text-5xl font-extrabold text-[#011f4b]">{score}%</p>
+                <p className="text-5xl font-extrabold text-[#011f4b]">
+                  {loading ? '...' : error ? '--' : score ?? '--'}
+                </p>
               </div>
 
               {/* Status Card */}
@@ -64,14 +98,13 @@ const ExamResult = () => {
             <div>
               <div className="w-full bg-[#b3cde0] rounded-full h-3 overflow-hidden">
                 <div
-                  className="h-3 rounded-full"
+                  className="h-3 rounded-full bg-brand-card"
                   style={{
                     width: "65%",
-                    background: "linear-gradient(90deg, #03396c, #005b96, #6497b1)",
                   }}
                 />
               </div>
-              <p className="text-xs font-bold tracking-widest text-[#6497b1] mt-2 text-center">
+              <p className="text-xs font-bold tracking-widest text-brand-card mt-2 text-center">
                 PROCESSING BATCH!
               </p>
             </div>
@@ -90,8 +123,7 @@ const ExamResult = () => {
             <div className="flex justify-center pt-2">
               <button
                 onClick={() => {}}
-                className="px-10 py-3 rounded-full font-semibold text-white text-sm shadow-md transition hover:opacity-90"
-                style={{ background: "linear-gradient(135deg, #011f4b, #005b96)" }}
+                className="px-10 py-3 rounded-full font-semibold text-white text-sm shadow-md transition hover:bg-brand-card bg-brand-border"
               >
                 View Profile
               </button>
