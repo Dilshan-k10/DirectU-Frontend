@@ -29,6 +29,23 @@ const AdmissionUpload = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
+const aiSentences = [
+    "Scanning your profile for key achievements...",
+    "Mapping your experience with course requirements...",
+    "Extracting academic highlights from your documents...",
+    "Tailoring admission insights specifically for you...",
+    "Finalizing your personalized admission roadmap..."
+  ];
+  
+  const [sentenceIndex, setSentenceIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSentenceIndex((prev) => (prev + 1) % aiSentences.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     const user = getUser();
     if (!user?.name) navigate("/login");
@@ -118,6 +135,8 @@ const AdmissionUpload = () => {
         @keyframes modalIn { from { opacity: 0; transform: scale(0.85) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         @keyframes checkBounce { 0%,100% { transform: scale(1); } 30% { transform: scale(1.3); } 60% { transform: scale(0.9); } }
         @keyframes shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-6px); } 40%,80% { transform: translateX(6px); } }
+        @keyframes textFadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-text-fade { animation: textFadeIn 0.5s ease forwards; }
         .animate-backdrop { animation: backdropIn 0.25s ease forwards; }
         .animate-modal { animation: modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards; }
         .animate-check { animation: checkBounce 0.6s ease 0.2s both; }
@@ -155,13 +174,15 @@ const AdmissionUpload = () => {
         <h1 className="text-5xl lg:text-7xl font-bold mb-10 leading-tight">
           Ready to <br /> Analyze Your <br /> Admission?
         </h1>
-        <div className="flex items-start space-x-4 mt-8 max-w-md">
+        <div className="flex items-start space-x-4 mt-8 max-w-md h-24">
           <BsStars className="text-white text-3xl flex-shrink-0 mt-1" />
           <div>
             <h3 className="font-semibold text-lg mb-1">AI Analysis in Progress</h3>
-            <p className="text-gray-300 text-sm leading-relaxed">
-              Our AI will analyze your documents to calculate GPA conversions
-              and match course requirements automatically.
+            <p 
+              key={sentenceIndex} 
+              className="text-gray-300 text-sm leading-relaxed animate-text-fade"
+            >
+              {aiSentences[sentenceIndex]}
             </p>
           </div>
         </div>
