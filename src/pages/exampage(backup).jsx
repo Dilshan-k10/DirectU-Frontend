@@ -46,96 +46,11 @@ const ExamPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [completed, setCompleted] = useState(false);
 
-  // Anti-cheat: warning banner shown inside the UI
-  const [warning, setWarning] = useState('');
-  const violationCountRef = React.useRef(0);
-
-  const showWarning = (msg) => {
-    violationCountRef.current += 1;
-    setWarning(`⚠️ ${msg} (Violation #${violationCountRef.current})`);
-    setTimeout(() => setWarning(''), 4000);
-  };
-
   // Timer state: 30 minutes (1800 seconds) for exam duration
   const EXAM_DURATION = 30 * 60; // 30 minutes in seconds
   const [secondsLeft, setSecondsLeft] = useState(EXAM_DURATION);
   const timerRef = React.useRef(null);
   const autoSubmitRef = React.useRef(false);
-
-  // ── Anti-cheat: Fullscreen ──────────────────────────────────────────────────
-  useEffect(() => {
-    if (!loading && questions.length > 0) {
-      setTimeout(() => {
-        document.documentElement.requestFullscreen().catch(() => {});
-      }, 300);
-    }
-  }, [loading, questions.length]);
-
-  useEffect(() => {
-    const onFullscreenChange = () => {
-      if (!document.fullscreenElement && !completed) {
-        showWarning('You exited fullscreen. This is recorded.');
-        setTimeout(() => {
-          document.documentElement.requestFullscreen().catch(() => {});
-        }, 500);
-      }
-    };
-    document.addEventListener('fullscreenchange', onFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [completed]);
-
-  // ── Anti-cheat: Tab switching ────────────────────────────────────────────────
-  useEffect(() => {
-    const onVisibilityChange = () => {
-      if (document.hidden && !completed) {
-        console.warn('User switched tab');
-        showWarning('Tab switching detected. This is recorded.');
-      }
-    };
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [completed]);
-
-  // ── Anti-cheat: Right-click & keyboard shortcuts ─────────────────────────────
-  useEffect(() => {
-    const onContextMenu = (e) => e.preventDefault();
-
-    const onKeyDown = (e) => {
-      const blocked =
-        e.key === 'F5' ||
-        (e.ctrlKey && e.key === 'r') ||
-        (e.ctrlKey && e.key === 'R');
-      if (blocked) {
-        e.preventDefault();
-        showWarning('Action blocked during exam.');
-      }
-    };
-
-    document.addEventListener('contextmenu', onContextMenu);
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('contextmenu', onContextMenu);
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // ── localStorage: restore saved answers on mount ─────────────────────────────
-  useEffect(() => {
-    if (!degreeId) return;
-    const saved = localStorage.getItem(`exam_answers_${degreeId}`);
-    if (saved) {
-      try { setAnswersByQuestionId(JSON.parse(saved)); } catch { /* ignore */ }
-    }
-  }, [degreeId]);
-
-  // ── localStorage: persist answers on every change ────────────────────────────
-  useEffect(() => {
-    if (!degreeId || !Object.keys(answersByQuestionId).length) return;
-    localStorage.setItem(`exam_answers_${degreeId}`, JSON.stringify(answersByQuestionId));
-  }, [answersByQuestionId, degreeId]);
 
   // Fetch exam questions for the selected degree when component mounts or degreeId changes
   useEffect(() => {
@@ -290,9 +205,7 @@ const ExamPage = () => {
       await calculateExamScore({ studentId, degreeId });
 
       setCompleted(true);
-      localStorage.removeItem(`exam_answers_${degreeId}`);
       // Redirect to results page
-      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
       navigate('/exam-result', { state: { applicationId: location.state?.applicationId } });
     } catch (e) {
       setError(e?.message || 'Failed to submit exam answers.');
@@ -340,13 +253,6 @@ const ExamPage = () => {
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
-
-                {/* Anti-cheat warning banner */}
-                {warning && (
-                  <div className="mb-4 rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700">
-                    {warning}
-                  </div>
-                )}
 
                 {/* Question content: shows loading state, errors, completion message, or actual question */}
                 <div className="mt-5">
