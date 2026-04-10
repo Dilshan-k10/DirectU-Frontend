@@ -206,7 +206,7 @@ const ExamPage = () => {
 
       setCompleted(true);
       // Redirect to results page
-      navigate('/exam-result');
+      navigate('/exam-result', { state: { applicationId: location.state?.applicationId } });
     } catch (e) {
       setError(e?.message || 'Failed to submit exam answers.');
     } finally {

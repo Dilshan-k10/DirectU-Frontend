@@ -311,8 +311,12 @@ const AdmissionResult = () => {
         <div className="w-full lg:w-1/3 p-6 lg:p-12 flex items-start justify-center">
           {!loading && !error && (
             <div data-aos="fade-left" data-aos-delay="200">
+            
               {alternatives.length > 0 ? (
                 <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+                  <div>
+              <h4 className="pb-4 font-bold text-md">What We Suggest for You</h4>
+            </div>
                   <img
                     src={
                       programImages[alternativeProgramId] ||
@@ -437,7 +441,7 @@ const AdmissionResult = () => {
                 type="checkbox"
                 checked={agreedToRules}
                 onChange={(e) => setAgreedToRules(e.target.checked)}
-                className="w-4 h-4 accent-green-500 cursor-pointer"
+                className="w-4 h-4 accent-brand-card cursor-pointer"
               />
               <span className="text-white/80 text-sm">I agree to the rules</span>
             </label>
@@ -452,10 +456,11 @@ const AdmissionResult = () => {
                 onClick={() => {
                   if (!agreedToRules) return;
                   setShowExamModal(false);
-                  navigate('/exam', { state: { degreeId: pendingExamDegreeId } });
+                  sessionStorage.setItem('examApplicationId', applicationId);
+                  navigate('/exam', { state: { degreeId: pendingExamDegreeId, applicationId } });
                 }}
                 disabled={!agreedToRules}
-                className={`flex-1 bg-green-500 hover:bg-green-600 transition text-white font-semibold py-3 rounded-xl text-sm ${
+                className={`flex-1 bg-brand-border hover:bg-brand-card transition text-white font-semibold py-3 rounded-xl text-sm ${
                   !agreedToRules ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
